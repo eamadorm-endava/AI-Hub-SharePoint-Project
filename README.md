@@ -57,3 +57,11 @@ In a terminal at the root of this repository, execute
 
         az login
 
+### 6. Activate pre-commit (Optional)
+
+You can use pre-commit to format and lint-check Python and Terraform files before each commit using Ruff and Terraform FMT
+
+In a terminal at the root of this repository, execute
+
+        uv run pre-commit install
+
