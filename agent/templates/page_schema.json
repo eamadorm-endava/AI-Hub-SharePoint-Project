@@ -1,0 +1,25 @@
+{
+  "title": "Explorando {{topic}}",
+  "sections": [
+    {
+      "heading": "Introducción",
+      "content": "Descripción general del tema {{topic}} y su relevancia actual."
+    },
+    {
+      "heading": "Aplicaciones",
+      "content": "Casos de uso reales de {{topic}} en la industria."
+    },
+    {
+      "heading": "Recursos Visuales",
+      "images": [
+        "https://example.com/image1.jpg",
+        "https://example.com/image2.jpg"
+      ],
+      "links": [
+        "https://learn.microsoft.com/en-us/azure/cognitive-services/",
+        "https://github.com/topics/{{topic}}"
+      ]
+    }
+  ],
+  "summary": "Resumen final sobre la importancia de {{topic}} y próximos pasos."
+}
