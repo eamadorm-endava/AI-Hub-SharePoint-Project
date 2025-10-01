@@ -8,24 +8,23 @@ variable "resource_group_name" {
   type        = string
   description = "Name of the main resource group. Manually created"
   default     = "ai-hub-sharepoint"
-  
 }
 
 variable "resources_location" {
   type        = string
   description = "Location of the resources"
   default     = "Mexico Central"
-  
+
 }
 
 variable "storage_account_name" {
-    type = string
-    description = "Name of the storage account. Manually created"
-    default = "endavaaihubstorage"
+  type        = string
+  description = "Name of the storage account. Manually created"
+  default     = "endavaaihubstorage"
 }
 
 variable "storage_container" {
-    type = string
-    description = "Name of the storage container. Manually created"
-    default = "ai-hub-storage-container"
+  type        = string
+  description = "Name of the storage container. Manually created"
+  default     = "ai-hub-storage-container"
 }
