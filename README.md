@@ -32,4 +32,5 @@ The AI Agent should work as follows:
 - *graph/*: Microsoft Graph API
 - *docs/*: Technical documentation
 - *.github/workflows/*: CI/CD pipelines
+- *notebooks/*: To test some code before creating Python scripts
 
