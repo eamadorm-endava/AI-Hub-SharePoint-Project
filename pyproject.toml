@@ -8,6 +8,7 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+    "loguru>=0.7.3",
     "pydantic>=2.11.9",
     "pydantic-settings>=2.11.0",
 ]
