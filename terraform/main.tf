@@ -52,3 +52,29 @@ resource "azurerm_key_vault" "main-key-vault" {
   }
 
 }
+################################################################### App Registration ######################################################################
+# Microsoft Entra ID (Azure AD) Application registration for the AI Hub application
+
+# Main module to create an app registration in MS Entra ID (Azure AD)
+resource "azuread_application" "ai-hub-app" {
+  display_name = "ai-hub-app-ms-entra"
+  description  = "App registration for the AI Hub application to access SharePoint Online"
+  owners       = [data.azurerm_client_config.current.object_id]
+
+  required_resource_access {
+
+    resource_app_id = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
+
+    resource_access {
+      id   = "df85f4d6-4e22-4d1c-8c0f-3ec3f9c3e5c5" # Sites.ReadWrite.All
+      type = "Role"
+    }
+  }
+}
+
+# Creation of the service principal for the app registration. 
+# This is required to assign roles to the app registration
+resource "azuread_service_principal" "ai-hub-sp" {
+  client_id = azuread_application.ai-hub-app.client_id
+  owners    = [data.azurerm_client_config.current.object_id]
+}
