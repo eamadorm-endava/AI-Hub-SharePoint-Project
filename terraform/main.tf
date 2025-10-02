@@ -52,3 +52,42 @@ resource "azurerm_key_vault" "main-key-vault" {
   }
 
 }
+################################################################### App Registration ######################################################################
+# Microsoft Entra ID (Azure AD) Application registration for the AI Hub application
+
+# Main module to create an app registration in MS Entra ID (Azure AD)
+resource "azuread_application" "ai-hub-app" {
+  display_name = "ai-hub-app-ms-entra"
+  description  = "App registration for the AI Hub application to access SharePoint Online"
+  owners       = [data.azurerm_client_config.current.object_id]
+
+  required_resource_access {
+
+    resource_app_id = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
+
+    resource_access {
+      id   = "9492366f-7969-46a4-8d15-ed1a20078fff" # Sites.ReadWrite.All
+      type = "Role"
+    }
+  }
+}
+
+# Creation of the service principal for the app registration. 
+# This is required to assign roles to the app registration
+resource "azuread_service_principal" "ai-hub-sp" {
+  client_id = azuread_application.ai-hub-app.client_id
+  owners    = [data.azurerm_client_config.current.object_id]
+}
+
+# Secret credential for the App (client secret)
+resource "azuread_application_password" "ai-hub-secret" {
+  application_id = azuread_application.ai-hub-app.id
+  display_name   = "ai-hub-secret"
+}
+
+# Store the secret credential value in Key Vault
+resource "azurerm_key_vault_secret" "ai-hub-client-secret" {
+  name         = "AI-HUB-CLIENT-SECRET"
+  value        = azuread_application_password.ai-hub-secret.value
+  key_vault_id = azurerm_key_vault.main-key-vault.id
+}

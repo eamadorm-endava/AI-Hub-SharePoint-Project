@@ -28,5 +28,6 @@ dev = [
     "pydantic-settings>=2.11.0",
 ]
 notebooks = [
+    "dotenv>=0.9.9",
     "ipykernel>=6.30.1",
 ]
