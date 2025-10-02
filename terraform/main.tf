@@ -78,3 +78,16 @@ resource "azuread_service_principal" "ai-hub-sp" {
   client_id = azuread_application.ai-hub-app.client_id
   owners    = [data.azurerm_client_config.current.object_id]
 }
+
+# Secret credential for the App (client secret)
+resource "azuread_application_password" "ai-hub-secret" {
+  application_id = azuread_application.ai-hub-app.id
+  display_name   = "ai-hub-secret"
+}
+
+# Store the secret credential value in Key Vault
+resource "azurerm_key_vault_secret" "ai-hub-client-secret" {
+  name         = "AI-HUB-CLIENT-SECRET"
+  value        = azuread_application_password.ai-hub-secret.value
+  key_vault_id = azurerm_key_vault.main-key-vault.id
+}
