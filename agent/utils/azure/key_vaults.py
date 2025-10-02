@@ -18,3 +18,16 @@ def get_secret(vault_url: str, secret_name: str) -> str:
     secret_client = SecretClient(vault_url=vault_url, credential=credential)
 
     return SecretStr(secret_client.get_secret(secret_name).value)
+
+
+def list_secrets(vault_url: str) -> list[str]:
+    """
+    List all secret names in an Azure Key Vault. Code adapted from:
+    https://learn.microsoft.com/en-us/python/api/overview/azure/keyvault-secrets-readme?view=azure-python#list-secrets
+
+    Args:
+        vault_url (str): The URL of the Azure Key Vault.
+    """
+    secret_client = SecretClient(vault_url=vault_url, credential=credential)
+
+    return [secret.name for secret in secret_client.list_properties_of_secrets()]
