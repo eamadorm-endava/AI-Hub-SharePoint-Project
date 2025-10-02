@@ -11,7 +11,7 @@ source = { virtual = "." }
 ai-agent = [
     { name = "openai" },
 ]
-ai-news-xml-creator = [
+ai-news-automation = [
     { name = "bs4" },
     { name = "feedparser" },
     { name = "requests" },
@@ -36,7 +36,7 @@ notebooks = [
 
 [package.metadata.requires-dev]
 ai-agent = [{ name = "openai", specifier = ">=2.0.0" }]
-ai-news-xml-creator = [
+ai-news-automation = [
     { name = "bs4", specifier = ">=0.0.2" },
     { name = "feedparser", specifier = ">=6.0.12" },
     { name = "requests", specifier = ">=2.32.5" },

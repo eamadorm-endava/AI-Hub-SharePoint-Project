@@ -10,7 +10,7 @@ dependencies = []
 ai-agent = [
     "openai>=2.0.0",
 ]
-ai-news-xml-creator = [
+ai-news-automation = [
     "bs4>=0.0.2",
     "feedparser>=6.0.12",
     "requests>=2.32.5",
