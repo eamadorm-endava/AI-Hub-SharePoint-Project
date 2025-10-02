@@ -7,8 +7,18 @@ requires-python = ">=3.12"
 dependencies = []
 
 [dependency-groups]
+ai-agent = [
+    "openai>=2.0.0",
+]
+azure-libraries = [
+    "azure-functions>=1.23.0",
+    "azure-identity>=1.25.0",
+    "azure-keyvault-secrets>=4.10.0",
+    "azure-storage-blob>=12.26.0",
+]
 dev = [
     "loguru>=0.7.3",
+    "pre-commit>=4.3.0",
     "pydantic>=2.11.9",
     "pydantic-settings>=2.11.0",
 ]
