@@ -66,7 +66,7 @@ resource "azuread_application" "ai-hub-app" {
     resource_app_id = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
 
     resource_access {
-      id   = "df85f4d6-4e22-4d1c-8c0f-3ec3f9c3e5c5" # Sites.ReadWrite.All
+      id   = "9492366f-7969-46a4-8d15-ed1a20078fff" # Sites.ReadWrite.All
       type = "Role"
     }
   }
