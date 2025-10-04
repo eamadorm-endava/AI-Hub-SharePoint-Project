@@ -38,7 +38,7 @@ def retrieve_ai_news(url: str, search_keywords: list[str]) -> pd.DataFrame:
         {
             "title": entry.title.replace('\'', ''), # Remove single quotes to avoid issues in SharePoint
             "news_link": entry.link,
-            "image_url": extract_news_image(entry.link), # Extract main image from the news article
+            "image_link": extract_news_image(entry.link), # Extract main image from the news article
             "publish_date": format_date(entry.published)
         }
         for entry in feed.entries if any(keyword.lower() in entry.title.lower() for keyword in search_keywords)
