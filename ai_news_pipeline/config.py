@@ -20,3 +20,15 @@ class AINewsSettings(BaseSettings):
             pattern=r".*\.xlsx$",
         ),
     ]
+    SEARCH_KEYWORDS: Annotated[
+        list[str],
+        Field(
+            default=[
+                "AI", "A.I.", "Artificial Intelligence", "Machine Learning", "Deep Learning", 
+                "Neural Networks", "NLP", "Computer Vision", "Data Science", "Gemini", 
+                "Bard", "ChatGPT", "GPT-4", "DALL-E", "MidJourney", "Stable Diffusion", 
+                "Claude", "LLaMA", "Whisper"
+            ],
+            description="List of keywords to filter AI news articles.",
+        ),
+    ]
