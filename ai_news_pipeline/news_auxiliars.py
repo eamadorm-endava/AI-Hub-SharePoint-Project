@@ -64,7 +64,7 @@ def extract_news_image(news_url: str) -> str:
     return image
 
 
-def store_ai_news_to_excel(ai_news: list[dict[str, str]], local_file_path: str) -> None:
+def store_to_excel(ai_news: list[dict[str, str]], local_file_path: str) -> None:
     """
     Store AI news data into an Excel file.
 
