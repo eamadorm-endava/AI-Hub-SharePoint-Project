@@ -51,8 +51,10 @@ def extract_news_image(news_url: str) -> str:
     all_containers = soup.select(".elementor-widget-container")
 
     containers_with_images = [c for c in all_containers if c.find("img")]
-    return [
+    image = [
         container.find("img").get("src")
         for container in containers_with_images
         if container.find("img").get("width") == "800"
     ][0]
+
+    return image
