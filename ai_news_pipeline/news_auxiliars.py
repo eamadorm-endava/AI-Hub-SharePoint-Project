@@ -1,10 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-import pandas as pd
-from openpyxl.worksheet.table import Table, TableStyleInfo
-from openpyxl.utils import get_column_letter
-import os
 
 
 def format_date(date_str: str) -> str:
@@ -62,45 +58,3 @@ def extract_news_image(news_url: str) -> str:
     ][0]
 
     return image
-
-
-def store_to_excel(ai_news: list[dict[str, str]], local_file_path: str) -> None:
-    """
-    Store AI news data into an Excel file.
-
-    Args:
-        ai_news (list[dict[str, str]]): List of dictionaries containing news details.
-        local_file_path (str): Path to the output Excel file. (e.g., '')
-    
-    Returns:
-        None
-    """
-    if not isinstance(ai_news, list) or not all(isinstance(item, dict) for item in ai_news):
-        raise ValueError("Input must be a list of dictionaries representing AI news data.")
-    if not isinstance(local_file_path, str): 
-        raise ValueError("File path must be a string representing a valid local file path.")
-
-    local_path = '/'.join(local_file_path.split("/")[:-1])
-
-    if not os.path.exists(local_path):
-        raise ValueError(f"The directory {local_path} does not exist.")
-    elif not local_file_path.endswith('.xlsx'):
-        raise ValueError("The file name must end with '.xlsx'.")
-
-    ai_news_df = pd.DataFrame(ai_news)
-
-    with pd.ExcelWriter(local_file_path, engine='openpyxl') as writer:
-        ai_news_df.to_excel(writer, index=False, sheet_name='AI-News')
-        workbook  = writer.book
-        worksheet = writer.sheets["AI-News"]
-        (max_row, max_col) = ai_news_df.shape
-
-        # Calculate the table range in Excel format (e.g., "A1:D10")
-        table_ref = f"A1:{get_column_letter(max_col)}{max_row + 1}"
-
-        table = Table(displayName="AIEventsTable", ref=table_ref)
-        style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
-                            showLastColumn=False, showRowStripes=True, showColumnStripes=False)
-        table.tableStyleInfo = style
-        worksheet.add_table(table)
-
