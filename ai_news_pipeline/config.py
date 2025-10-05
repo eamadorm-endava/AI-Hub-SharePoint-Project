@@ -24,7 +24,7 @@ class AINewsSettings(BaseSettings):
         list[str],
         Field(
             default=[
-                "AI", "A.I.", "Artificial Intelligence", "Machine Learning", "Deep Learning", 
+                " AI ", "AI ", "AI ", "A.I.", " AI-", "AI-", "Artificial Intelligence", "Machine Learning", "Deep Learning", 
                 "Neural Networks", "NLP", "Computer Vision", "Data Science", "Gemini", 
                 "Bard", "ChatGPT", "GPT-4", "DALL-E", "MidJourney", "Stable Diffusion", 
                 "Claude", "LLaMA", "Whisper"
