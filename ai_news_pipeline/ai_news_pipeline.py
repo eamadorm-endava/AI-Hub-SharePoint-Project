@@ -17,13 +17,19 @@ def main():
     # Step 2: Filter news articles by date (last 2 days)
     logger.info(f"Filtering news articles from the last {news_settings.DAYS_BACK} days...")
     ai_news = filter_news_by_date(df=ai_news, date_column=news_settings.DATE_COLUMN, days=news_settings.DAYS_BACK)
-    logger.info(f"{len(ai_news)} articles remain after date filtering.")
+    
+    n_news_extracted = len(ai_news)
+    logger.info(f"{n_news_extracted} articles remain after date filtering.")
 
-    # Step 3: Store the filtered news articles to an Excel file
-    logger.info("Storing AI news into an Excel file...")
-    store_to_excel(ai_news, news_settings.LOCAL_FILE_PATH)
-    logger.info(f"AI news successfully stored in {news_settings.LOCAL_FILE_PATH}")
+    if n_news_extracted > 0:
 
+        # Step 3: Store the filtered news articles to an Excel file
+        logger.info(f"Storing {n_news_extracted} news into an Excel file...")
+        store_to_excel(ai_news, news_settings.LOCAL_FILE_PATH)
+        logger.info(f"AI news successfully stored in {news_settings.LOCAL_FILE_PATH}")
+
+    else:
+        logger.info("There's no news to save into an excel file")
 
 if __name__ == "__main__":
     main()
