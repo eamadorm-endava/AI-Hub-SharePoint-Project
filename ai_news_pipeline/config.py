@@ -15,7 +15,7 @@ class AINewsSettings(BaseSettings):
     LOCAL_FILE_PATH: Annotated[
         str,
         Field(
-            default="data/ai_news.xlsx",
+            default="path-to-local-storage.xlsx",
             description="The local file path to store the AI news Excel file.",
             pattern=r".*\.xlsx$",
         ),
