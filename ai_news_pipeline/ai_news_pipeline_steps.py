@@ -106,7 +106,7 @@ def store_to_excel(ai_news: pd.DataFrame, local_file_path: str) -> None:
     if not isinstance(local_file_path, str): 
         raise ValueError("File path must be a string representing a valid local file path.")
 
-    local_path = '/'.join(local_file_path.split("/")[:-1])
+    local_path = '/'.join(local_file_path.split("/")[:-1]) if len(local_file_path.split("/")) > 1 else local_file_path[:-5]
 
     if not os.path.exists(local_path):
         raise ValueError(f"The directory {local_path} does not exist.")
