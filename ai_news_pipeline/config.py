@@ -3,7 +3,7 @@ from pydantic import Field
 from typing import Annotated
 
 
-class AINewsSettings(BaseSettings):
+class AINewsConfig(BaseSettings):
     NEWS_URL: Annotated[
         str,
         Field(
