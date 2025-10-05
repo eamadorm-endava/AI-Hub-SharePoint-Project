@@ -24,6 +24,7 @@ azure-libraries = [
     "azure-storage-blob>=12.26.0",
 ]
 dev = [
+    "argparse>=1.4.0",
     "datetime>=5.5",
     "loguru>=0.7.3",
     "pre-commit>=4.3.0",
