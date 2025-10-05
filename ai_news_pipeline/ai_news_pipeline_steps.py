@@ -49,7 +49,7 @@ def retrieve_ai_news(url: str, search_keywords: list[str]) -> pd.DataFrame:
     return ai_news_df
 
 
-def filter_news_by_date(df: pd.DataFrame, date_column: str = "publish_date", days: int = 2) -> pd.DataFrame:
+def filter_news_by_date(df: pd.DataFrame, date_column: str, days: int) -> pd.DataFrame:
     """
     Filter news articles in the DataFrame that are newer than a specified number of days.
 
