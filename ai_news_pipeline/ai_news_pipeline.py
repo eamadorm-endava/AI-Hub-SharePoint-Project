@@ -5,8 +5,8 @@ from ai_news_pipeline.config import AINewsConfig
 from ai_news_pipeline.ai_news_pipeline_steps import (
     retrieve_ai_news,
     filter_news_by_date,
-    store_to_excel,
 )
+from utils.io_utils import store_df_to_excel
 
 
 news_config = AINewsConfig()
@@ -17,6 +17,8 @@ def main(
     case_insen_search_kw: list[str],
     days_back: int,
     local_file_path: str,
+    excel_sheet_name: str,
+    excel_table_name: str,
 ):
     """
     Pipeline that extracts AI-related news from an specific website, clean, filter, and transform the data, and then
@@ -29,6 +31,8 @@ def main(
                             (e.g. 2 -> Get the news from the last 2 days),
         local_file_path: str -> Local path where the excel file generated will be stored
                             (e.g. -> local-file-path/file_name.xlsx)
+        sheet_name: str -> Name of the Excel Sheet name where the data will be stored
+        table_name: str -> Name of the Excel table where the data will be stored
     """
     logger.info("Starting AI news retrieval process...")
 
@@ -53,7 +57,12 @@ def main(
     if n_news_extracted > 0:
         # Step 3: Store the filtered news articles to an Excel file
         logger.info(f"Storing {n_news_extracted} news into an Excel file...")
-        store_to_excel(ai_news, local_file_path)
+        store_df_to_excel(
+            df=ai_news,
+            local_file_path=local_file_path,
+            sheet_name=excel_sheet_name,
+            table_name=excel_table_name,
+        )
         logger.info(f"AI news successfully stored in {local_file_path}")
 
     else:
@@ -93,6 +102,18 @@ if __name__ == "__main__":
         default=news_config.LOCAL_FILE_PATH,
         help="Path where the excel file will be stored",
     )
+    parser.add_argument(
+        "--excel-sheet-name",
+        type=str,
+        default=news_config.EXCEL_SHEET_NAME,
+        help="Name of the Excel sheet where the data will be stored",
+    )
+    parser.add_argument(
+        "--excel-table-name",
+        type=str,
+        default=news_config.EXCEL_TABLE_NAME,
+        help="Name of the Excel table where the data will be stored",
+    )
 
     args = parser.parse_args()
 
@@ -101,4 +122,6 @@ if __name__ == "__main__":
         case_insen_search_kw=args.case_insen_search_kw,
         days_back=args.days_back,
         local_file_path=args.local_file_path,
+        excel_sheet_name=args.excel_sheet_name,
+        excel_table_name=args.excel_table_name,
     )

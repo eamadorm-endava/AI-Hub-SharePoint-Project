@@ -1,10 +1,7 @@
 import feedparser
 from datetime import datetime, timezone, timedelta
 import pandas as pd
-from openpyxl.worksheet.table import Table, TableStyleInfo
-from openpyxl.utils import get_column_letter
 from loguru import logger
-import os
 
 from ai_news_pipeline.news_auxiliars import format_date, extract_news_image
 
@@ -113,52 +110,3 @@ def filter_news_by_date(df: pd.DataFrame, date_column: str, days: int) -> pd.Dat
     filtered_df.rename(columns={f"{date_column}_str": date_column}, inplace=True)
 
     return filtered_df
-
-
-def store_to_excel(ai_news: pd.DataFrame, local_file_path: str) -> None:
-    """
-    Store AI news data into an Excel file.
-
-    Args:
-        ai_news (pd.DataFrame): DataFraem containing AI news data.
-        local_file_path (str): Path to the output Excel file. (e.g., '')
-
-    Returns:
-        None
-    """
-    if not isinstance(ai_news, pd.DataFrame):
-        raise ValueError("ai_news must be a pandas DataFrane containing AI news data.")
-    if not isinstance(local_file_path, str):
-        raise ValueError(
-            "File path must be a string representing a valid local file path."
-        )
-
-    local_path = (
-        "/".join(local_file_path.split("/")[:-1])
-        if len(local_file_path.split("/")) > 1
-        else local_file_path[:-5]
-    )
-
-    if not os.path.exists(local_path):
-        raise ValueError(f"The directory {local_path} does not exist.")
-    elif not local_file_path.endswith(".xlsx"):
-        raise ValueError("The file name must end with '.xlsx'.")
-
-    with pd.ExcelWriter(local_file_path, engine="openpyxl") as writer:
-        ai_news.to_excel(writer, index=False, sheet_name="AI-News")
-        worksheet = writer.sheets["AI-News"]
-        (max_row, max_col) = ai_news.shape
-
-        # Calculate the table range in Excel format (e.g., "A1:D10")
-        table_ref = f"A1:{get_column_letter(max_col)}{max_row + 1}"
-
-        table = Table(displayName="RecentAINews", ref=table_ref)
-        style = TableStyleInfo(
-            name="TableStyleMedium9",
-            showFirstColumn=False,
-            showLastColumn=False,
-            showRowStripes=True,
-            showColumnStripes=False,
-        )
-        table.tableStyleInfo = style
-        worksheet.add_table(table)

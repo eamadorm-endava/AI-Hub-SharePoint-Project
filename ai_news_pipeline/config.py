@@ -20,6 +20,20 @@ class AINewsConfig(BaseSettings):
             pattern=r".*\.xlsx$",
         ),
     ]
+    EXCEL_SHEET_NAME: Annotated[
+        str,
+        Field(
+            default="AI-News",
+            description="Name of the excel sheet where the data will be stored",
+        ),
+    ]
+    EXCEL_TABLE_NAME: Annotated[
+        str,
+        Field(
+            default="RecentAINews",
+            description="Name of the excel table where the data will be stored",
+        ),
+    ]
     CASE_INSEN_SEARCH_KW: Annotated[
         list[str],
         Field(
@@ -49,7 +63,7 @@ class AINewsConfig(BaseSettings):
         list[str],
         Field(
             default=[" AI ", "AI ", "AI ", "A.I.", " AI-", "AI-"],
-            description="List of keywords to filter AI News articles by. This will be exactly match",
+            description="List of keywords to filter AI News articles by. This will be an exact match",
         ),
     ]
     DAYS_BACK: Annotated[
