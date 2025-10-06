@@ -83,6 +83,7 @@ class AINewsConfig(BaseSettings):
         ),
     ]
 
+    # To force to read .env file
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
