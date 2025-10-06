@@ -10,8 +10,8 @@ class WebScrapper(ABC):
     def parse_url(url: str, **kargs) -> pd.DataFrame:
         pass
 
+    @staticmethod
     def store_df_to_excel(
-        self,
         df: pd.DataFrame,
         local_file_path: str,
         sheet_name: str,
@@ -32,21 +32,21 @@ class WebScrapper(ABC):
         string_params = [local_file_path, sheet_name, table_name]
 
         if not isinstance(df, pd.DataFrame):
-            raise TypeError("df must be a pandas DataFrane.")
-        if not all([isinstance(param, str) and param != "" for param in string_params]):
+            raise TypeError("df must be a pandas DataFrame.")
+        if not all(
+            [isinstance(param, str) and param.strip() for param in string_params]
+        ):
             raise TypeError(
                 "local_file_path, sheet_name, and table_name parameters "
                 "must be not null strings"
             )
 
-        local_path = (
-            "/".join(local_file_path.split("/")[:-1])
-            if len(local_file_path.split("/")) > 1
-            else local_file_path[:-5]  # takes out '.xlsx'
-        )
+        # Gets the path without the file name
+        local_path = os.path.dirname(local_file_path)
 
-        if not os.path.exists(local_path):
+        if local_path and not os.path.exists(local_path):
             raise ValueError(f"The directory {local_path} does not exist.")
+
         elif not local_file_path.endswith(".xlsx"):
             raise ValueError("The file name must end with '.xlsx'.")
 
