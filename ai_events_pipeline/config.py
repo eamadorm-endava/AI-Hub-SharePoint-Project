@@ -38,3 +38,9 @@ class AIEventsConfig(BaseSettings):
             description="Name of the excel table where the data will be stored",
         ),
     ]
+
+    # To force to read .env file
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        extra = "allow"
