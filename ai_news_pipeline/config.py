@@ -4,6 +4,13 @@ from typing import Annotated
 
 
 class AINewsConfig(BaseSettings):
+    BASE_URL_PATTERN: Annotated[
+        str,
+        Field(
+            default=r"https://[\w\.-]+/",
+            description="Pattern to get the base url",
+        ),
+    ]
     NEWS_URL: Annotated[
         str,
         Field(
