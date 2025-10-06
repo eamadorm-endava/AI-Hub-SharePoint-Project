@@ -32,7 +32,7 @@ class WebScrapper(ABC):
         string_params = [local_file_path, sheet_name, table_name]
 
         if not isinstance(df, pd.DataFrame):
-            raise ValueError("df must be a pandas DataFrane.")
+            raise TypeError("df must be a pandas DataFrane.")
         if not all([isinstance(param, str) and param != "" for param in string_params]):
             raise TypeError(
                 "local_file_path, sheet_name, and table_name parameters "
