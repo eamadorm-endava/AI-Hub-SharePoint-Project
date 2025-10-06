@@ -12,7 +12,7 @@ class AINewsConfig(BaseSettings):
             pattern=r"^https?://.*/feed/",
         ),
     ]
-    LOCAL_FILE_PATH: Annotated[
+    AI_NEWS_FILE_PATH: Annotated[
         str,
         Field(
             default="path-to-local-storage.xlsx",

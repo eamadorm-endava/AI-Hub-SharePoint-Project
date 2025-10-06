@@ -99,7 +99,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--local-file-path",
         type=str,
-        default=news_config.LOCAL_FILE_PATH,
+        default=news_config.AI_NEWS_FILE_PATH,
         help="Path where the excel file will be stored",
     )
     parser.add_argument(
