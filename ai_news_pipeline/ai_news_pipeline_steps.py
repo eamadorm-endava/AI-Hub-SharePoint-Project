@@ -9,21 +9,31 @@ import os
 from ai_news_pipeline.news_auxiliars import format_date, extract_news_image
 
 
-def retrieve_ai_news(url: str, search_keywords: list[str]) -> pd.DataFrame:
+def retrieve_ai_news(url: str, 
+                     case_sen_search_kw: list[str],
+                     case_insen_search_kw: list[str]
+                     ) -> pd.DataFrame:
     """
     Retrieve AI-related news from the given RSS feed URL.
 
     Args:
         url (str): URL of the RSS feed.
-        search_keywords (list[str]): List of keywords to filter AI news articles.
-
+        case_sen_search_kw (list[str]): List of case sensitive keywords to filter AI news.
+                                            Example: 'ML' matches ['ML']
+        case_insen_search_kw (list[str]): List of case insensitive keywords to filter AI news articles.
+                                            Example: 'ML' matches ['ML', 'ml', 'Ml']
     Returns:
         pd.DataFrame: List of dictionaries containing news details.
     """
     if not isinstance(url, str):
         raise ValueError("Input must be a string representing the RSS feed URL.")
-    if not isinstance(search_keywords, list) or not all(isinstance(keyword, str) for keyword in search_keywords):
-        raise ValueError("Keywords must be a list of strings.")
+    if not all(isinstance(param, list) for param in [case_sen_search_kw, case_insen_search_kw]):
+        raise ValueError(
+            f"Parameters case_sen_search_kw, case_insen_search_kw must be "
+            f"both list of strings"
+            )
+    if not all(isinstance(kw, str) for kw in case_sen_search_kw + case_insen_search_kw):
+        raise ValueError("case_sen_search_kw and case_insen_search_kw must be lists of strings.")
 
     logger.info("Fetching RSS feed...")
     try:
@@ -33,7 +43,10 @@ def retrieve_ai_news(url: str, search_keywords: list[str]) -> pd.DataFrame:
 
     
     # Extract relevant data from feed entries  
-    logger.info(f"Filtering news articles based on keywords: {search_keywords}")
+    logger.info(
+        "Filtering news articles based on keywords: \n"
+        f"{'\n'.join(case_sen_search_kw + case_insen_search_kw)}"
+    )
     ai_news = [
         {
             "title": entry.title.replace('\'', ''), # Remove single quotes to avoid issues in SharePoint
@@ -41,7 +54,9 @@ def retrieve_ai_news(url: str, search_keywords: list[str]) -> pd.DataFrame:
             "image_link": extract_news_image(entry.link), # Extract main image from the news article
             "publish_date": format_date(entry.published)
         }
-        for entry in feed.entries if any(keyword.lower() in entry.title.lower() for keyword in search_keywords)
+        for entry in feed.entries 
+        if any(kw in entry.title for kw in case_sen_search_kw)
+        or any(kw.lower() in entry.title.lower() for kw in case_insen_search_kw)
         ]
     
     ai_news_df = pd.DataFrame(ai_news)
@@ -49,7 +64,7 @@ def retrieve_ai_news(url: str, search_keywords: list[str]) -> pd.DataFrame:
     return ai_news_df
 
 
-def filter_news_by_date(df: pd.DataFrame, date_column: str = "publish_date", days: int = 2) -> pd.DataFrame:
+def filter_news_by_date(df: pd.DataFrame, date_column: str, days: int) -> pd.DataFrame:
     """
     Filter news articles in the DataFrame that are newer than a specified number of days.
 
@@ -106,7 +121,7 @@ def store_to_excel(ai_news: pd.DataFrame, local_file_path: str) -> None:
     if not isinstance(local_file_path, str): 
         raise ValueError("File path must be a string representing a valid local file path.")
 
-    local_path = '/'.join(local_file_path.split("/")[:-1])
+    local_path = '/'.join(local_file_path.split("/")[:-1]) if len(local_file_path.split("/")) > 1 else local_file_path[:-5]
 
     if not os.path.exists(local_path):
         raise ValueError(f"The directory {local_path} does not exist.")
