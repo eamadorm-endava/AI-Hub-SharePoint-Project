@@ -9,7 +9,8 @@ news_config = AINewsConfig()
 
 
 def main(
-        search_keywords: list[str],
+        case_sen_search_kw: list[str],
+        case_insen_search_kw: list[str],
         days_back: int,
         local_file_path: str,
 ):
@@ -18,15 +19,22 @@ def main(
     stores them into an excel file.
 
     Args:
-        search_keywords: list[str] -> List of keywords to filter the AI-news by,
-        days_back: int -> Number of days that you want to retrieve the data from (e.g. 2 -> Get the news from the last 2 days),
-        local_file_path: str -> Local path where the excel file generated will be stored (e.g. -> local-file-path/file_name.xlsx)
+        case_sen_search_kw: list[str] -> List of case sensitive keywords to filter the AI-news by,
+        case_insen_search_kw: list[str] -> List of case insensitive keywords to filter the AI-news by,
+        days_back: int -> Number of days that you want to retrieve the data from 
+                            (e.g. 2 -> Get the news from the last 2 days),
+        local_file_path: str -> Local path where the excel file generated will be stored
+                            (e.g. -> local-file-path/file_name.xlsx)
     """
     logger.info("Starting AI news retrieval process...")
     
     # Step 1: Retrieve AI news from RSS feed
     logger.info("Fetching AI news from RSS feed...")
-    ai_news = retrieve_ai_news(url=news_config.NEWS_URL, search_keywords=search_keywords)
+    ai_news = retrieve_ai_news(
+        url=news_config.NEWS_URL, 
+        case_sen_search_kw=case_sen_search_kw, 
+        case_insen_search_kw=case_insen_search_kw
+    )
     logger.info(f"Retrieved {len(ai_news)} news articles:")
 
     # Step 2: Filter news articles by date (last 2 days)
@@ -52,9 +60,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AI-Hub SharePoint: Pipeline to extract AI News from the web")
     
     parser.add_argument(
-        "--search-keywords",
+        "--case-insen-search-kw",
         type = lambda keywords_string: [keyword for keyword in keywords_string.split(",")],
-        default=news_config.SEARCH_KEYWORDS,
+        default=news_config.CASE_INSEN_SEARCH_KW,
+        help="Keywords to filter the news from (expected input: 'AI,Machine Learning,NLP')"
+    )
+    parser.add_argument(
+        "--case-sen-search-kw",
+        type = lambda keywords_string: [keyword for keyword in keywords_string.split(",")],
+        default=news_config.CASE_SEN_SEARCH_KW,
         help="Keywords to filter the news from (expected input: 'AI,Machine Learning,NLP')"
     )
     parser.add_argument(
@@ -73,7 +87,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(
-        search_keywords=args.search_keywords, # '-' become '_'
+        case_sen_search_kw=args.case_sen_search_kw, # '-' become '_'
+        case_insen_search_kw=args.case_insen_search_kw,
         days_back=args.days_back,
         local_file_path=args.local_file_path
     )

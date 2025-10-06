@@ -20,17 +20,24 @@ class AINewsConfig(BaseSettings):
             pattern=r".*\.xlsx$",
         ),
     ]
-    SEARCH_KEYWORDS: Annotated[
+    CASE_INSEN_SEARCH_KW: Annotated[
         list[str],
         Field(
             default=[
-                " AI ", "AI ", "AI ", "A.I.", " AI-", "AI-", "Artificial Intelligence", "Machine Learning", "Deep Learning", 
+                "Artificial Intelligence", "Machine Learning", "Deep Learning", 
                 "Neural Networks", "NLP", "Computer Vision", "Data Science", "Gemini", 
                 "Bard", "ChatGPT", "GPT-4", "DALL-E", "MidJourney", "Stable Diffusion", 
                 "Claude", "LLaMA", "Whisper"
             ],
-            description="List of keywords to filter AI news articles.",
+            description="List of keywords to filter AI news articles. This will be matched no matter the case",
         ),
+    ]
+    CASE_SEN_SEARCH_KW: Annotated[
+        list[str],
+        Field(
+            default=[ " AI ", "AI ", "AI ", "A.I.", " AI-", "AI-"],
+            description="List of keywords to filter AI News articles by. This will be exactly match"
+        )
     ]
     DAYS_BACK: Annotated[
         int,
