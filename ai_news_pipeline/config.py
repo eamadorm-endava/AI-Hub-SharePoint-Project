@@ -24,10 +24,23 @@ class AINewsConfig(BaseSettings):
         list[str],
         Field(
             default=[
-                "Artificial Intelligence", "Machine Learning", "Deep Learning", 
-                "Neural Networks", "NLP", "Computer Vision", "Data Science", "Gemini", 
-                "Bard", "ChatGPT", "GPT-4", "DALL-E", "MidJourney", "Stable Diffusion", 
-                "Claude", "LLaMA", "Whisper"
+                "Artificial Intelligence",
+                "Machine Learning",
+                "Deep Learning",
+                "Neural Networks",
+                "NLP",
+                "Computer Vision",
+                "Data Science",
+                "Gemini",
+                "Bard",
+                "ChatGPT",
+                "GPT-4",
+                "DALL-E",
+                "MidJourney",
+                "Stable Diffusion",
+                "Claude",
+                "LLaMA",
+                "Whisper",
             ],
             description="List of keywords to filter AI news articles. This will be matched no matter the case",
         ),
@@ -35,9 +48,9 @@ class AINewsConfig(BaseSettings):
     CASE_SEN_SEARCH_KW: Annotated[
         list[str],
         Field(
-            default=[ " AI ", "AI ", "AI ", "A.I.", " AI-", "AI-"],
-            description="List of keywords to filter AI News articles by. This will be exactly match"
-        )
+            default=[" AI ", "AI ", "AI ", "A.I.", " AI-", "AI-"],
+            description="List of keywords to filter AI News articles by. This will be exactly match",
+        ),
     ]
     DAYS_BACK: Annotated[
         int,
@@ -59,4 +72,4 @@ class AINewsConfig(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
-        extra="allow"
+        extra = "allow"
