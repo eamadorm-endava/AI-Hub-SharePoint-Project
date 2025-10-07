@@ -4,19 +4,25 @@ from typing import Annotated
 
 
 class AINewsConfig(BaseSettings):
+    MIT_NEWS_FEED_URL: Annotated[
+        str,
+        Field(
+            default="https://news.mit.edu/rss/feed",
+            description="The RSS feed URL for the MIT page",
+        ),
+    ]
+    AI_NEWS_FEED_URL: Annotated[
+        str,
+        Field(
+            default="https://www.artificialintelligence-news.com/artificial-intelligence-news/feed/",
+            description="The RSS feed URL for AI news.",
+        ),
+    ]
     BASE_URL_PATTERN: Annotated[
         str,
         Field(
             default=r"https://[\w\.-]+/",
             description="Pattern to get the base url",
-        ),
-    ]
-    NEWS_URL: Annotated[
-        str,
-        Field(
-            default="https://www.artificialintelligence-news.com/artificial-intelligence-news/feed/",
-            description="The RSS feed URL for AI news.",
-            pattern=r"^https?://.*/feed/",
         ),
     ]
     AI_NEWS_FILE_PATH: Annotated[
