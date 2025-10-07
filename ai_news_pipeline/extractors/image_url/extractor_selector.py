@@ -15,9 +15,7 @@ news_config = AINewsConfig()
 class ImageExtractorSelector:
     __base_url_pattern: str = news_config.BASE_URL_PATTERN
 
-    def __init__(self, news_url: str):
-        self.news_url = news_url
-        self.base_url = self._get_base_url(url=self.news_url)
+    def __init__(self):
         self.__extractors = self.__define_extractors()
 
     @property
@@ -51,21 +49,26 @@ class ImageExtractorSelector:
         """
         return re.search(self.__base_url_pattern, url).group().rstrip("/")
 
-    def get_image_extractor(self) -> Optional[BaseImageExtractor]:
+    def get_image_extractor(self, news_url: str) -> Optional[BaseImageExtractor]:
         """
         Based on the extractors selected and the news_url introduced, retrieves
         a BaseImageExtractor instance
 
+        Args:
+            news_url: str -> Link to the news article
+
         Returns:
             Optional[BaseImageExtractor]: An instance of a BaseImageExtractor the right one is found
         """
-        extractor = self.extractors.get(self.base_url, None)
+        base_url = self._get_base_url(url=news_url)
+
+        extractor = self.extractors.get(base_url, None)
 
         if not extractor:
-            logger.error(f"No extractor found for the news url: {self.news_url}")
+            logger.error(f"No extractor found for the news url: {news_url}")
             return None
 
         logger.info(
-            f"Extractor '{extractor.__name__}' selected for base URL: {self.base_url}"
+            f"Extractor '{extractor.__name__}' selected for base URL: {base_url}"
         )
-        return extractor(self.news_url)
+        return extractor(news_url)
