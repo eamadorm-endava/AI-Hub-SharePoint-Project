@@ -43,3 +43,7 @@ This class defines the complete, fixed workflow for extracting an image. It is r
 Classes like **MITImageExtractor** and **AINEWSImageExtractor** inherit from BaseImageExtractor. 
 
 Their only responsibility is to provide a concrete implementation for the _get_image_link() method. They focus exclusively on the unique task of parsing the HTML structure of their target website, leaving all the boilerplate logic to the parent class.
+
+## How to use
+
+Check this [*notebook*](../../notebooks/image_extractors.ipynb) to see its implementation
