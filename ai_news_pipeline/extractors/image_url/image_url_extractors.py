@@ -12,9 +12,16 @@ news_config = AINewsConfig()
 
 
 class BaseImageExtractor(ABC):
+    # Private class attributes
+    __base_url_pattern: str = news_config.BASE_URL_PATTERN
+
     def __init__(self, url: str):
         self.url: str = url
         self._html_code: Optional[BeautifulSoup] = None
+
+    @property
+    def base_url_pattern(self):
+        return self.__base_url_pattern
 
     def _get_html_code(self) -> bool:
         """
@@ -74,7 +81,6 @@ class BaseImageExtractor(ABC):
 class MITImageExtractor(BaseImageExtractor):
     # Private class attributes
     __news_feed_url: str = news_config.MIT_NEWS_FEED_URL
-    __base_url_pattern: str = news_config.BASE_URL_PATTERN
 
     def __init__(self, news_url: str):
         """
@@ -90,10 +96,6 @@ class MITImageExtractor(BaseImageExtractor):
     @property
     def news_feed_url(self):
         return self.__news_feed_url
-
-    @property
-    def base_url_pattern(self):
-        return self.__base_url_pattern
 
     @property
     def base_url(self):
@@ -123,7 +125,6 @@ class MITImageExtractor(BaseImageExtractor):
 class AINEWSImageExtractor(BaseImageExtractor):
     # Private class attributes
     __news_feed_url: str = news_config.AI_NEWS_FEED_URL
-    __base_url_pattern: str = news_config.BASE_URL_PATTERN
 
     def __init__(self, news_url: str):
         """
@@ -139,10 +140,6 @@ class AINEWSImageExtractor(BaseImageExtractor):
     @property
     def news_feed_url(self):
         return self.__news_feed_url
-
-    @property
-    def base_url_pattern(self):
-        return self.__base_url_pattern
 
     @property
     def base_url(self):
