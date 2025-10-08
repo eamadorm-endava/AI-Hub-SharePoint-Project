@@ -115,6 +115,10 @@ class NewsExtractor:
             )
             return None
 
+        logger.info("Filtering by the next parameters...")
+        logger.info(f"{filter_key = }")
+        logger.info(f"{case_sen_search_kw =}")
+        logger.info(f"{case_insen_search_kw =}")
         news_filtered = [
             article
             for article in news_extracted
