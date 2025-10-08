@@ -15,6 +15,7 @@ class BaseImageExtractor(ABC):
     # Private class attributes
     __base_url_pattern: str = news_config.BASE_URL_PATTERN
     _feed_url: Optional[str] = None
+    _base_feed_url: Optional[str] = None
 
     def __init__(self):
         self.current_article_url: Optional[str] = None
