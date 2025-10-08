@@ -32,17 +32,35 @@ class NewsExtractor:
             case_insen_search_kw: list[str] → Case-insensitive keywords for filtering titles.
             max_days_old: int → Maximum age (in days) allowed for articles.
         """
-        self.current_feed_url: Optional[str] = None
-        self.proposed_feed_url: Optional[str] = None
+        # Private attributes, which cannot be directly accessed from the outside
+        self.__current_feed_url: Optional[str] = None
+        self.__previous_feed_url: Optional[str] = None
         self.__img_extractor: Optional[Type[BaseImageExtractor]] = None
+
+        # Public attributes, can be directly accessed from the outside
         self.current_data: Optional[pd.DataFrame] = None
         self.case_sen_search_kw: list[str] = case_sen_search_kw
         self.case_insen_search_kw: list[str] = case_insen_search_kw
         self.max_days_old: int = max_days_old
 
-    def __set_current_feed_url(self) -> None:
+    # @property -> to create a read-only attribute without exposing the real one.
+    # Won't be allowed to set the attribute:
+    #   extractor.previous_feed_url = "https://..." (raise AttributeError)
+    @property
+    def previous_feed_url(self):
+        return self.__previous_feed_url
+
+    # To create an attribute with a specific setter logic
+    # In this case, everytime the attribute 'current_feed_url' is rewritten
+    # the current_feed_url function will be executed
+    @property
+    def current_feed_url(self):
+        return self.__current_feed_url
+
+    @current_feed_url.setter
+    def current_feed_url(self, feed_url: str) -> None:
         """
-        Once feed_url is added, automatically select an ImageExtractor class
+        Set feed url and automatically select an ImageExtractor class
 
         Args:
             feed_url: str -> RSS-compatible URL to retrieve news articles from.
@@ -50,19 +68,29 @@ class NewsExtractor:
         Returns:
             None
         """
-        if not isinstance(self.proposed_feed_url, str):
+        if not isinstance(feed_url, str):
             logger.error("feed_url must be a string")
             return
 
-        if not self.proposed_feed_url.startswith("https://"):
+        if not feed_url.startswith("https://"):
             logger.error("feed_url must start with 'https://'")
 
         # Setting the feed_url and its ImageExtractor class
-        logger.info(f"Setting current feed url to {self.proposed_feed_url}")
-        self.current_feed_url = self.proposed_feed_url
-        self.__img_extr_selector.get_extractor(self.current_feed_url)
+        logger.info(f"Setting current feed url to {feed_url}")
+        self.__previous_feed_url = self.__current_feed_url
+        self.__current_feed_url = feed_url
+        self.__img_extractor = self.__img_extr_selector.get_extractor(
+            self.__current_feed_url
+        )
 
-    def __articles_extracted(self) -> bool:
+    # To allow set the attribute 'current_feed_url' in two different ways:
+    #       - extractor.current_feed_url = "https://..."
+    #       - extractor.set_current_feed_url("https://...")
+    # Both ways will also update 'previous_feed_url', which is a read-only attribute
+    def set_current_feed_url(self, feed_url: str) -> None:
+        self.current_feed_url = feed_url
+
+    def articles_extracted(self) -> bool:
         """
         Verifies if the articles previously extracted comes from the same proposed_feed_url, if so,
         returns True, otherwise False
@@ -74,10 +102,10 @@ class NewsExtractor:
         # In case self.current_data has not been instanciated yet or the feed_url is different
         return (
             isinstance(self.current_data, pd.DataFrame)
-            and self.proposed_feed_url == self.current_feed_url
+            and self.__previous_feed_url == self.__current_feed_url
         )
 
-    def _get_articles(self, feed_url: str) -> None:
+    def get_articles(self) -> Optional[pd.DataFrame]:
         """
         Retrieves AI-related news data in its raw format from the feed_url. The data obtained per news is:
             - title
@@ -87,31 +115,26 @@ class NewsExtractor:
 
         The data obtained is stored in self.current_data
 
-        Args
-            feed_url: str -> RSS-compatible URL to retrieve news articles from.
-
         Returns:
-            None
+            Optional[pd.DataFrame] -> The data obtained
         """
-        # Error handlers for feed_url is in self.__set_current_feed_url
-        self.proposed_feed_url = feed_url
-
-        if not self.__articles_extracted():
-            self.__set_current_feed_url()
+        if self.articles_extracted():
+            logger.info(
+                f"Articles from feed url {self.__previous_feed_url} already extracted"
+            )
+            return self.current_data
 
         try:
-            feed = feedparser.parse(self.current_feed_url)
+            feed = feedparser.parse(self.__current_feed_url)
 
         except Exception as e:
             logger.error(
-                f"Articles from {self.current_feed_url} could not be extracted: {e}"
+                f"Articles from {self.__current_feed_url} could not be extracted: {e}"
             )
 
         extracted_articles = [
             {
-                "title": entry.title.replace("’", "").replace(
-                    "'", ""
-                ),  # To avoid issues
+                "title": entry.title.replace("'", ""),  # To avoid issues with strings
                 "news_link": entry.link,
                 "image_link": self.__img_extractor.extract(entry.link)
                 if self.__img_extractor
@@ -128,15 +151,18 @@ class NewsExtractor:
             articles.publish_date = pd.to_datetime(articles.publish_date)
 
             self.current_data = articles
+            self.__previous_feed_url = self.__current_feed_url
 
         else:
             logger.error(
-                f"No articles extracted from {self.current_feed_url} "
+                f"No articles extracted from {self.__current_feed_url} "
                 " Make sure the url is RSS-compatible"
             )
             # Restores the attribute current_data to avoid mix articles
             # of different feed urls
             self.current_data = None
+
+        return self.current_data
 
     def _filter_title_by_keywords(
         self,
@@ -162,10 +188,9 @@ class NewsExtractor:
         if not case_insen_search_kw:
             case_insen_search_kw = self.case_insen_search_kw
 
-        if not self.__articles_extracted():
+        if not self.articles_extracted():
             logger.error(
-                "No data found. Please run '_get_articles()' before "
-                "calling this method."
+                "No data found. Please run 'get_articles()' before calling this method."
             )
             return
 
@@ -206,10 +231,9 @@ class NewsExtractor:
         if not max_days_old:
             max_days_old = self.max_days_old
 
-        if not self.__articles_extracted():
+        if not self.articles_extracted():
             logger.error(
-                "No data found. Please run '_get_articles()' before "
-                "calling this method."
+                "No data found. Please run 'get_articles()' before calling this method."
             )
             return
 
@@ -249,10 +273,9 @@ class NewsExtractor:
         if not table_name:
             table_name = news_config.EXCEL_TABLE_NAME
 
-        if not self.__articles_extracted():
+        if not self.articles_extracted():
             logger.error(
-                "No data found. Please run '_get_articles()' before "
-                "calling this method."
+                "No data found. Please run 'get_articles()' before calling this method."
             )
             return
 
@@ -313,7 +336,7 @@ class NewsExtractor:
         logger.info("Starting articles extraction...")
         # Step 1: Retrive all the available articles from the feed_url introduced
         # when instanciating this class
-        self._get_articles(feed_url)
+        self.get_articles(feed_url)
 
         # Step 2: Filter articles by keywords
         self._filter_title_by_keywords(
