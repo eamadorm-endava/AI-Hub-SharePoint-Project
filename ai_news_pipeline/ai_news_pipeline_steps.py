@@ -1,112 +1,126 @@
-import feedparser
-from datetime import datetime, timezone, timedelta
 import pandas as pd
 from loguru import logger
 
-from ai_news_pipeline.news_auxiliars import format_date, extract_news_image
 
-
-def retrieve_ai_news(
-    url: str, case_sen_search_kw: list[str], case_insen_search_kw: list[str]
+def filter_by_keywords(
+    df: pd.DataFrame,
+    filter_column: str,
+    case_sen_search_kw: list[str],
+    case_insen_search_kw: list[str],
 ) -> pd.DataFrame:
     """
-    Retrieve AI-related news from the given RSS feed URL.
+    Filter a dataframe by keywords (either case sensitive or case insensitive) over
+    a filter column
 
     Args:
-        url (str): URL of the RSS feed.
-        case_sen_search_kw (list[str]): List of case sensitive keywords to filter AI news.
-                                            Example: 'ML' matches ['ML']
-        case_insen_search_kw (list[str]): List of case insensitive keywords to filter AI news articles.
-                                            Example: 'ML' matches ['ML', 'ml', 'Ml']
-    Returns:
-        pd.DataFrame: List of dictionaries containing news details.
-    """
-    if not isinstance(url, str):
-        raise ValueError("Input must be a string representing the RSS feed URL.")
-    if not all(
-        isinstance(param, list) for param in [case_sen_search_kw, case_insen_search_kw]
-    ):
-        raise ValueError(
-            "Parameters case_sen_search_kw, case_insen_search_kw must be "
-            "both list of strings"
-        )
-    if not all(isinstance(kw, str) for kw in case_sen_search_kw + case_insen_search_kw):
-        raise ValueError(
-            "case_sen_search_kw and case_insen_search_kw must be lists of strings."
-        )
-
-    logger.info("Fetching RSS feed...")
-    try:
-        feed = feedparser.parse(url)
-    except Exception as e:
-        raise RuntimeError(f"Error parsing RSS feed: {e}")
-
-    # Extract relevant data from feed entries
-    logger.info(
-        "Filtering news articles based on keywords: \n"
-        f"{'\n'.join(case_sen_search_kw + case_insen_search_kw)}"
-    )
-    ai_news = [
-        {
-            # Remove single quotes to avoid issues in SharePoint
-            "title": entry.title.replace("'", ""),
-            "news_link": entry.link,
-            # Extract main image from the news article
-            "image_link": extract_news_image(entry.link),
-            "publish_date": format_date(entry.published),
-        }
-        for entry in feed.entries
-        if any(kw in entry.title for kw in case_sen_search_kw)
-        or any(kw.lower() in entry.title.lower() for kw in case_insen_search_kw)
-    ]
-
-    ai_news_df = pd.DataFrame(ai_news)
-
-    return ai_news_df
-
-
-def filter_news_by_date(df: pd.DataFrame, date_column: str, days: int) -> pd.DataFrame:
-    """
-    Filter news articles in the DataFrame that are newer than a specified number of days.
-
-    Args:
-        df (pd.DataFrame): DataFrame containing news articles.
-        date_column (str): Name of the column containing publication dates. Date format must be '%Y-%m-%d %H:%M:%SZ'.
-        days (int): Number of days to filter by. Example: 2, for articles newer than the last 2 days.
+        df: pd.DataFrame -> DataFrame containing the data to be filtered
+        filter_column: str -> Name of the column to filter by
+        case_sen_search_kw: Optional[list[str]] -> List of Case Sensitive Search Keywords.
+        case_insen_search_kw: Optional[list[str]] -> List of (Case Insensitive Search Keywords)
 
     Returns:
-        pd.DataFrame: Filtered DataFrame with articles newer than the specified number of days.
+        Optional[pd.DataFrame] -> Dataframe filtered by keywords
     """
     if not isinstance(df, pd.DataFrame):
-        raise ValueError("Input must be a pandas DataFrame.")
-    if date_column not in df.columns:
-        raise ValueError(f"Column '{date_column}' does not exist in the DataFrame.")
-    if not isinstance(days, int) or days < 0:
-        raise ValueError("Days must be a non-negative integer.")
+        logger.error("The parameter 'df' must be a pandas DataFrame")
+        return
+    if not isinstance(filter_column, str):
+        logger.error("The parameter 'filter_column' must be a not null string")
+        return
+    elif filter_column not in df.columns:
+        logger.error(
+            "'filter_column' must be the name of a column existing in the DataFrame 'df'"
+        )
+        return
+    if not all(
+        isinstance(kw_list, list)
+        for kw_list in [case_sen_search_kw, case_insen_search_kw]
+    ):
+        logger.error(
+            "The parameters 'case_sen_search_kw' and 'case_insen_search_kw' must be lists of strings"
+        )
+        return
+    if not all(
+        isinstance(kw, str) and kw != ""
+        for kw in case_sen_search_kw + case_insen_search_kw
+    ):
+        logger.error(
+            "All the entries in the lists 'case_sen_search_kw' and 'case_insen_search_kw' must "
+            "be not null strings"
+        )
+        return
 
-    mexico_city_timezone = timezone(timedelta(hours=-6))
-    now_utc = datetime.now(timezone.utc)
-    mexico_city_time = now_utc.astimezone(mexico_city_timezone)
+    logger.debug("Filtering articles by the next parameters...")
+    logger.debug(f"{case_sen_search_kw =}")
+    logger.debug(f"{case_insen_search_kw =}")
+    logger.debug(f"Filtering by column: {filter_column}")
 
-    # To keep the original DataFrame unchanged
+    def matches_keyword(text: str) -> bool:
+        match = any(kw in text for kw in case_sen_search_kw) | any(
+            kw.lower() in text.lower() for kw in case_insen_search_kw
+        )
+
+        return match
+
     df_copy = df.copy()
 
-    # Ensure the date column is a datetime type
-    df_copy[date_column] = pd.to_datetime(
-        df_copy[date_column], format=r"%Y-%m-%d %H:%M:%SZ", utc=True
+    df_copy = df_copy[df_copy[filter_column].apply(matches_keyword)]
+
+    # Reset dataframe index to keep sequential order
+    df_copy = df_copy.reset_index(drop=True)
+
+    logger.info(
+        f"Keyword filtering complete. {len(df_copy)} articles matched the criteria."
     )
 
-    filtered_df = df_copy[
-        df_copy[date_column] >= mexico_city_time - timedelta(days=days)
-    ]
+    return df_copy
 
-    # Convert the date column back to string format
-    filtered_df.loc[:, f"{date_column}_str"] = filtered_df[date_column].dt.strftime(
-        r"%Y-%m-%d %H:%M:%SZ"
+
+def filter_by_age(
+    df: pd.DataFrame, filter_column: str, max_days_old: int
+) -> pd.DataFrame:
+    """
+    Filters the articles by age since its publication date
+
+    Args:
+        max_days_old: int -> Maximum days old an article must have
+
+    Returns:
+        pd.DataFrame
+    """
+    if not isinstance(df, pd.DataFrame):
+        logger.error("The parameter 'df' must be a pandas DataFrame")
+        return
+    if not isinstance(filter_column, str):
+        logger.error("The parameter 'filter_column' must be a not null string")
+        return
+    elif filter_column not in df.columns:
+        logger.error(
+            "'filter_column' must be the name of a column existing in the DataFrame 'df'"
+        )
+        return
+    if not isinstance(max_days_old, int):
+        logger.error("The parameter 'max_days_old' must be a positive integer")
+    elif max_days_old < 0:
+        logger.error("The parameter 'max_days_old' cannot be lower than zero")
+        return
+
+    logger.info(f"Filtering articles published within the last {max_days_old} days.")
+
+    df_copy = df.copy()
+
+    # As publish_date is in UTC, the current_date must also be in this timezone
+    current_date = pd.Timestamp.utcnow()
+    max_publish_date = current_date - pd.Timedelta(days=max_days_old)
+
+    df_copy = df_copy[df_copy[filter_column] >= max_publish_date]
+
+    # Reset dataframe index to keep sequential order
+    df_copy = df_copy.reset_index(drop=True)
+
+    logger.info(
+        f"Date filtering complete. {len(df_copy)} articles "
+        "published within the allowed range."
     )
 
-    filtered_df.drop(date_column, axis=1, inplace=True)
-
-    filtered_df.rename(columns={f"{date_column}_str": date_column}, inplace=True)
-
-    return filtered_df
+    return df_copy

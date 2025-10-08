@@ -4,15 +4,28 @@ from typing import Annotated
 
 
 class AINewsConfig(BaseSettings):
-    NEWS_URL: Annotated[
+    MIT_NEWS_FEED_URL: Annotated[
+        str,
+        Field(
+            default="https://news.mit.edu/rss/feed",
+            description="The RSS feed URL for the MIT page",
+        ),
+    ]
+    AI_NEWS_FEED_URL: Annotated[
         str,
         Field(
             default="https://www.artificialintelligence-news.com/artificial-intelligence-news/feed/",
             description="The RSS feed URL for AI news.",
-            pattern=r"^https?://.*/feed/",
         ),
     ]
-    AI_NEWS_FILE_PATH: Annotated[
+    BASE_URL_PATTERN: Annotated[
+        str,
+        Field(
+            default=r"https://[\w\.-]+/",
+            description="Pattern to get the base url",
+        ),
+    ]
+    FILE_PATH: Annotated[
         str,
         Field(
             default="path-to-local-storage.xlsx",
@@ -66,20 +79,12 @@ class AINewsConfig(BaseSettings):
             description="List of keywords to filter AI News articles by. This will be an exact match",
         ),
     ]
-    DAYS_BACK: Annotated[
+    MAX_DAYS_OLD: Annotated[
         int,
         Field(
             default=2,
-            description="Number of days back to filter news articles.",
+            description="Maximum number of days since publication.",
             ge=1,
-        ),
-    ]
-    DATE_COLUMN: Annotated[
-        str,
-        Field(
-            default="publish_date",
-            description="The name of the date column in the news DataFrame.",
-            pattern=r"^\w+$",
         ),
     ]
 
