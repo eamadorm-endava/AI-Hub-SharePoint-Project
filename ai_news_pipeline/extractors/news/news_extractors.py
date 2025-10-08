@@ -74,7 +74,7 @@ class NewsExtractor:
         # In case self.current_data has not been instanciated yet or the feed_url is different
         return (
             isinstance(self.current_data, pd.DataFrame)
-            and self.proposed_feed_url != self.current_feed_url
+            and self.proposed_feed_url == self.current_feed_url
         )
 
     def _get_articles(self, feed_url: str) -> None:
