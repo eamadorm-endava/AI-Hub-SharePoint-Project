@@ -35,9 +35,9 @@ class NewsExtractor:
         self.__current_feed_url: Optional[str] = None
         self.__previous_feed_url: Optional[str] = None
         self.__img_extractor: Optional[Type[BaseImageExtractor]] = None
+        self.__current_data: Optional[pd.DataFrame] = None
 
         # Public attributes, can be directly accessed from the outside
-        self.current_data: Optional[pd.DataFrame] = None
         self.case_sen_search_kw: list[str] = case_sen_search_kw
         self.case_insen_search_kw: list[str] = case_insen_search_kw
         self.max_days_old: int = max_days_old
@@ -45,6 +45,10 @@ class NewsExtractor:
     # @property -> to create a read-only attribute without exposing the real one.
     # Won't be allowed to set the attribute:
     #   extractor.previous_feed_url = "https://..." (raise AttributeError)
+    @property
+    def current_data(self):
+        return self.__current_data
+
     @property
     def previous_feed_url(self):
         return self.__previous_feed_url
@@ -98,9 +102,9 @@ class NewsExtractor:
             bool -> True if the articles from the feed_url has already been extracted
         """
 
-        # In case self.current_data has not been instanciated yet or the feed_url is different
+        # In case self.__current_data has not been instanciated yet or the feed_url is different
         return (
-            isinstance(self.current_data, pd.DataFrame)
+            isinstance(self.__current_data, pd.DataFrame)
             and self.__previous_feed_url == self.__current_feed_url
         )
 
@@ -112,7 +116,7 @@ class NewsExtractor:
             - image_link
             - publish_date
 
-        The data obtained is stored in self.current_data
+        The data obtained is stored in self.__current_data
 
         Returns:
             Optional[pd.DataFrame] -> The data obtained
@@ -121,7 +125,7 @@ class NewsExtractor:
             logger.info(
                 f"Articles from feed url {self.__previous_feed_url} already extracted"
             )
-            return self.current_data
+            return self.__current_data
 
         try:
             feed = feedparser.parse(self.__current_feed_url)
@@ -149,7 +153,7 @@ class NewsExtractor:
 
             articles.publish_date = pd.to_datetime(articles.publish_date)
 
-            self.current_data = articles
+            self.__current_data = articles
             self.__previous_feed_url = self.__current_feed_url
 
         else:
@@ -159,6 +163,6 @@ class NewsExtractor:
             )
             # Restores the attribute current_data to avoid mix articles
             # of different feed urls
-            self.current_data = None
+            self.__current_data = None
 
-        return self.current_data
+        return self.__current_data
