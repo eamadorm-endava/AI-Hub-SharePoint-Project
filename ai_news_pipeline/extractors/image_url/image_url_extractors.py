@@ -68,7 +68,7 @@ class BaseImageExtractor(ABC):
         if self.current_article_url == article_url:
             return True
 
-        elif self._get_base_url(article_url) != self.__class__._base_feed_url:
+        elif self._get_base_url(article_url) != self._base_feed_url:
             logger.error(
                 f"The URL introduced in article_url: {article_url} does not correspond to the ImageExtractor defined"
             )
