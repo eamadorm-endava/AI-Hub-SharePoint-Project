@@ -20,7 +20,6 @@ class NewsExtractor:
 
     def __init__(
         self,
-        feed_url: str,
         case_sen_search_kw: list[str] = news_config.CASE_SEN_SEARCH_KW,
         case_insen_search_kw: list[str] = news_config.CASE_INSEN_SEARCH_KW,
         max_days_old: int = news_config.MAX_DAYS_OLD,
@@ -29,30 +28,56 @@ class NewsExtractor:
         Initializes a NewsExtractor instance.
 
         Args:
-            feed_url: str → RSS-compatible URL to retrieve news articles from.
             case_sen_search_kw: list[str] → Case-sensitive keywords for filtering titles.
             case_insen_search_kw: list[str] → Case-insensitive keywords for filtering titles.
             max_days_old: int → Maximum age (in days) allowed for articles.
         """
-        self.feed_url: str = feed_url
+        self.current_feed_url: Optional[str] = None
+        self.proposed_feed_url: Optional[str] = None
+        self.__img_extractor: Optional[Type[BaseImageExtractor]] = None
+        self.current_data: Optional[pd.DataFrame] = None
         self.case_sen_search_kw: list[str] = case_sen_search_kw
         self.case_insen_search_kw: list[str] = case_insen_search_kw
-        self.__img_extractor: Type[BaseImageExtractor] = (
-            self.__img_extr_selector.get_extractor(self.feed_url)
-        )
         self.max_days_old: int = max_days_old
-        self.current_data: Optional[pd.DataFrame] = None
+
+    def __set_current_feed_url(self) -> None:
+        """
+        Once feed_url is added, automatically select an ImageExtractor class
+
+        Args:
+            feed_url: str -> RSS-compatible URL to retrieve news articles from.
+
+        Returns:
+            None
+        """
+        if not isinstance(self.proposed_feed_url, str):
+            logger.error("feed_url must be a string")
+            return
+
+        if not self.proposed_feed_url.startswith("https://"):
+            logger.error("feed_url must start with 'https://'")
+
+        # Setting the feed_url and its ImageExtractor class
+        logger.info(f"Setting current feed url to {self.proposed_feed_url}")
+        self.current_feed_url = self.proposed_feed_url
+        self.__img_extr_selector.get_extractor(self.current_feed_url)
 
     def __articles_extracted(self) -> bool:
         """
-        Verifies if self.current_data is not empty
+        Verifies if the articles previously extracted comes from the same proposed_feed_url, if so,
+        returns True, otherwise False
+
+        Returns:
+            bool -> True if the articles from the feed_url has already been extracted
         """
-        if not isinstance(self.current_data, pd.DataFrame):
-            return False
 
-        return True
+        # In case self.current_data has not been instanciated yet or the feed_url is different
+        return (
+            isinstance(self.current_data, pd.DataFrame)
+            and self.proposed_feed_url != self.current_feed_url
+        )
 
-    def _get_articles(self) -> None:
+    def _get_articles(self, feed_url: str) -> None:
         """
         Retrieves AI-related news data in its raw format from the feed_url. The data obtained per news is:
             - title
@@ -62,14 +87,25 @@ class NewsExtractor:
 
         The data obtained is stored in self.current_data
 
+        Args
+            feed_url: str -> RSS-compatible URL to retrieve news articles from.
+
         Returns:
             None
         """
+        # Error handlers for feed_url is in self.__set_current_feed_url
+        self.proposed_feed_url = feed_url
+
+        if not self.__articles_extracted(feed_url):
+            self.__set_current_feed_url(feed_url)
+
         try:
-            feed = feedparser.parse(self.feed_url)
+            feed = feedparser.parse(self.current_feed_url)
 
         except Exception as e:
-            logger.error(f"Articles from {self.feed_url} could not be extracted: {e}")
+            logger.error(
+                f"Articles from {self.current_feed_url} could not be extracted: {e}"
+            )
 
         extracted_articles = [
             {
@@ -95,9 +131,12 @@ class NewsExtractor:
 
         else:
             logger.error(
-                f"No articles extracted from {self.feed_url} "
+                f"No articles extracted from {self.current_feed_url} "
                 " Make sure the url is RSS-compatible"
             )
+            # Restores the attribute current_data to avoid mix articles
+            # of different feed urls
+            self.current_data = None
 
     def _filter_title_by_keywords(
         self,
@@ -241,6 +280,7 @@ class NewsExtractor:
 
     def extract(
         self,
+        feed_url: str,
         case_sen_search_kw: Optional[list[str]] = None,
         case_insen_search_kw: Optional[list[str]] = None,
         max_days_old: Optional[int] = None,
@@ -259,6 +299,7 @@ class NewsExtractor:
             4. Optionally store the final dataset to Excel.
 
         Args:
+            feed_url: str → RSS-compatible URL to retrieve news articles from.
             case_sen_search_kw: Optional[list[str]] → Override for case-sensitive keywords.
             case_insen_search_kw: Optional[list[str]] → Override for case-insensitive keywords.
             max_days_old: Optional[int] → Override for maximum article age.
@@ -272,7 +313,7 @@ class NewsExtractor:
         logger.info("Starting articles extraction...")
         # Step 1: Retrive all the available articles from the feed_url introduced
         # when instanciating this class
-        self._get_articles()
+        self._get_articles(feed_url)
 
         # Step 2: Filter articles by keywords
         self._filter_title_by_keywords(
