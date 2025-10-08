@@ -65,7 +65,9 @@ class ImageExtractorSelector:
         extractor = self.extractors.get(base_url, None)
 
         if not extractor:
-            logger.error(f"No extractor found for the url: {url}")
+            logger.warning(
+                f"No image extractor found for the url: {url}. The data retrieve will not contain an image_url"
+            )
             return None
 
         logger.info(
