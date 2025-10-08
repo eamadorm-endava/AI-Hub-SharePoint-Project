@@ -23,7 +23,7 @@ def store_df_to_excel(
         None
     """
     if not isinstance(df, pd.DataFrame):
-        raise ValueError("df must be a pandas DataFrane.")
+        raise ValueError("df must be a pandas DataFrame.")
     if not isinstance(local_file_path, str):
         raise ValueError(
             "File path must be a string representing a valid local file path."
