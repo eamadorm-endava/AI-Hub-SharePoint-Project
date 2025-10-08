@@ -25,7 +25,7 @@ class AINewsConfig(BaseSettings):
             description="Pattern to get the base url",
         ),
     ]
-    AI_NEWS_FILE_PATH: Annotated[
+    FILE_PATH: Annotated[
         str,
         Field(
             default="path-to-local-storage.xlsx",
@@ -79,20 +79,12 @@ class AINewsConfig(BaseSettings):
             description="List of keywords to filter AI News articles by. This will be an exact match",
         ),
     ]
-    DAYS_BACK: Annotated[
+    MAX_DAYS_OLD: Annotated[
         int,
         Field(
             default=2,
-            description="Number of days back to filter news articles.",
+            description="Maximum number of days since publication.",
             ge=1,
-        ),
-    ]
-    DATE_COLUMN: Annotated[
-        str,
-        Field(
-            default="publish_date",
-            description="The name of the date column in the news DataFrame.",
-            pattern=r"^\w+$",
         ),
     ]
 
