@@ -96,8 +96,8 @@ class NewsExtractor:
         # Error handlers for feed_url is in self.__set_current_feed_url
         self.proposed_feed_url = feed_url
 
-        if not self.__articles_extracted(feed_url):
-            self.__set_current_feed_url(feed_url)
+        if not self.__articles_extracted():
+            self.__set_current_feed_url()
 
         try:
             feed = feedparser.parse(self.current_feed_url)
