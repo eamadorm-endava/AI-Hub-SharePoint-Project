@@ -10,7 +10,6 @@ from ai_news_pipeline.extractors.image_url.extractor_selector import (
 from ai_news_pipeline.extractors.image_url.image_url_extractors import (
     BaseImageExtractor,
 )
-from utils.io_utils import store_df_to_excel
 
 news_config = AINewsConfig()
 
@@ -257,46 +256,3 @@ class NewsExtractor:
             f"Date filtering complete. {len(self.current_data)} articles "
             "published within the allowed range."
         )
-
-    def _store_to_excel(
-        self,
-        local_file_path: str = None,
-        sheet_name: str = None,
-        table_name: str = None,
-    ) -> None:
-        if not local_file_path:
-            local_file_path = news_config.FILE_PATH
-
-        if not sheet_name:
-            sheet_name = news_config.EXCEL_SHEET_NAME
-
-        if not table_name:
-            table_name = news_config.EXCEL_TABLE_NAME
-
-        if not self.articles_extracted():
-            logger.error(
-                "No data found. Please run 'get_articles()' before calling this method."
-            )
-            return
-
-        initial_data = self.current_data.copy()
-        # Converting datetime types to strings
-        initial_data["publish_date_str"] = initial_data.publish_date.dt.strftime(
-            r"%Y-%m-%d %H:%M:%SZ"
-        )
-
-        # Deleting publish_date, as is the datetime column that will be replaced
-        initial_data.drop("publish_date", axis=1, inplace=True)
-
-        # Renaming publish_date_str to publish_date, this is because it will raise an error
-        # if I directly convert publish_date to str
-        initial_data.rename(columns={"publish_date_str": "publish_date"}, inplace=True)
-
-        # The function below already has error handlers for the parameters
-        store_df_to_excel(
-            df=initial_data,
-            local_file_path=local_file_path,
-            sheet_name=sheet_name,
-            table_name=table_name,
-        )
-        logger.info("Articles successfully stored")
