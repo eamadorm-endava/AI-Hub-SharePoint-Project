@@ -1,6 +1,6 @@
 from loguru import logger
 import re
-from typing import Optional
+from typing import Optional, Type
 from ai_news_pipeline.extractors.image_url.image_url_extractors import (
     BaseImageExtractor,
     AINEWSImageExtractor,
@@ -22,7 +22,7 @@ class ImageExtractorSelector:
     def extractors(self) -> dict[str, type[BaseImageExtractor]]:
         return self.__extractors
 
-    def __define_extractors(self) -> dict[str, type[BaseImageExtractor]]:
+    def __define_extractors(self) -> dict[str, Type[BaseImageExtractor]]:
         """
         Creates an attibute containing all the extractors registered.
 
@@ -39,8 +39,8 @@ class ImageExtractorSelector:
 
     def _get_base_url(self, url: str) -> str:
         """
-        Get the base_url from any url. Ex. news_url 'https://www.news.com/news_article1/' retrieves
-        'https://www.news.com'
+        Get the base_url from any url.
+        Example -> 'https://www.news.com/news_article1/' retrieves 'https://www.news.com'
 
         Args: url: str -> URL of the page
 
@@ -49,26 +49,26 @@ class ImageExtractorSelector:
         """
         return re.search(self.__base_url_pattern, url).group().rstrip("/")
 
-    def get_image_extractor(self, news_url: str) -> Optional[BaseImageExtractor]:
+    def get_extractor(self, url: str) -> Optional[BaseImageExtractor]:
         """
-        Based on the extractors selected and the news_url introduced, retrieves
+        Based on the extractors selected and the url introduced, retrieves
         a BaseImageExtractor instance
 
         Args:
-            news_url: str -> Link to the news article
+            url: str -> Link to the news article
 
         Returns:
             Optional[BaseImageExtractor]: An instance of a BaseImageExtractor the right one is found
         """
-        base_url = self._get_base_url(url=news_url)
+        base_url = self._get_base_url(url=url)
 
         extractor = self.extractors.get(base_url, None)
 
         if not extractor:
-            logger.error(f"No extractor found for the news url: {news_url}")
+            logger.error(f"No extractor found for the url: {url}")
             return None
 
         logger.info(
             f"Extractor '{extractor.__name__}' selected for base URL: {base_url}"
         )
-        return extractor(news_url)
+        return extractor()
