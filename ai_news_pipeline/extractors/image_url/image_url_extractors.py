@@ -80,7 +80,7 @@ class BaseImageExtractor(ABC):
         }
 
         try:
-            response = requests.get(article_url, headers=headers, timeout=10)
+            response = requests.get(article_url, headers=headers, timeout=60)
             response.raise_for_status()
 
             self.current_html_code = BeautifulSoup(response.content, "html.parser")
