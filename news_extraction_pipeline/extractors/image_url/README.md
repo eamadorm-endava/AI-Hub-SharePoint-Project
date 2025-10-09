@@ -1,6 +1,17 @@
 # Image Extractor Module
 
-This module provides a robust and extensible framework for extracting the main image URL from various news article web pages. It is designed to be efficient, easy to maintain, and simple to extend with new website extractors.
+ImageExtractors are built because the data extracted using the Python library *feedparser*, only retrieves the following fields:
+
+- title
+- news_url
+- publish_date
+
+Nevertheless, the AI-SharePoint contains a visual that requires also a link to a image that represents the news, you can see the visual [here](https://endava.sharepoint.com/sites/AINewsletter)
+
+In order to extract the news image, it was decided to create **web scrappers** that could be able to **extract** the **main image of the news_url**.
+
+
+This module provides a framework for extracting the main image URL from various news article web pages. It is designed to be efficient, easy to maintain, and simple to extend with new website extractors.
 
 ## Problems solved
 Extracting specific data from different websites often leads to repetitive and difficult-to-maintain code. Without a proper design, a project can face several issues:
@@ -46,4 +57,4 @@ Their only responsibility is to provide a concrete implementation for the _get_i
 
 ## How to use
 
-Check this [*notebook*](../../notebooks/image_extractors.ipynb) to see its implementation
+Check this [*notebook*](../../../notebooks/image_extractors.ipynb) to see its implementation

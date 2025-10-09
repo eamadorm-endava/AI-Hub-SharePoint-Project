@@ -3,11 +3,11 @@ import pandas as pd
 from loguru import logger
 from typing import Type, Optional
 
-from ai_news_pipeline.config import AINewsConfig
-from ai_news_pipeline.selectors.extractor_selector import (
+from news_extraction_pipeline.config import AINewsConfig
+from news_extraction_pipeline.selectors.extractor_selector import (
     ImageExtractorSelector,
 )
-from ai_news_pipeline.extractors.image_url.image_url_extractors import (
+from news_extraction_pipeline.extractors.image_url.image_url_extractors import (
     BaseImageExtractor,
 )
 

@@ -2,7 +2,7 @@ import concurrent.futures
 import pandas as pd
 from loguru import logger
 from typing import Optional
-from ai_news_pipeline.extractors.news.news_extractors import NewsExtractor
+from news_extraction_pipeline.extractors.news.news_extractors import NewsExtractor
 
 
 def extract_from_feed(feed_url: str) -> Optional[pd.DataFrame]:
