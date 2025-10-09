@@ -76,24 +76,10 @@ This module handles:
 
 The pipeline is designed with modularity and extensibility in mind, allowing each component to handle a specific stage of the extraction process. Below is an overview of the core modules and their roles:
 
-### extractors/
+### [extractors/](/news_extraction_pipeline/extractors/)
 
 Contains the logic for extracting data from RSS feeds and image URLs from news articles.
 
-#### extractors/news/news_extractors.py
- 
-Implements classes that parse RSS feeds and extract fields like title, publish date, and article link.
-
-#### extractors/image_url/image_url_extractors.py
-
-Implements multiple classes to extract image URLs from HTML content.
-
-### selectors/
+### [selectors/](/news_extraction_pipeline/selectors/)
 
 Contains the bridge logic for dynamically selecting the appropriate extractor class.
-
-#### selectors/image_extractor_selectors.py
-
-Uses a registry pattern to choose the best image extractor based on RSS introduced.
-
-
