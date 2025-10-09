@@ -87,6 +87,13 @@ class AINewsConfig(BaseSettings):
             ge=1,
         ),
     ]
+    DATE_COLUMN: Annotated[
+        str,
+        Field(
+            default="publish_date",
+            description="Name of the DataFrame column to filter by date",
+        ),
+    ]
 
     # To force to read .env file
     class Config:
