@@ -23,7 +23,6 @@ case_insen_search_kw = Annotated[
             "MidJourney",
             "Stable Diffusion",
             "Claude",
-            "LLaMA",
             "Whisper",
         ],
         description="List of keywords to filter AI news articles. This will be matched no matter the case",
