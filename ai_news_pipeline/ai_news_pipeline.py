@@ -6,6 +6,7 @@ from ai_news_pipeline.ai_news_pipeline_steps import (
     extract_from_multiple_feed_urls,
     filter_by_date_threshold,
     filter_by_keywords,
+    convert_datetime_columns_to_str,
 )
 from utils.io_utils import store_df_to_excel
 
@@ -62,13 +63,19 @@ def main(
         filter_column=news_config.COLUMN_TO_FILTER_BY_KW,
     )
 
-    # Step 5: Store the filtered news articles to an Excel file
-    n_articles_extracted = len(articles_filtered_by_date)
+    # Step 5: Decide whether to store the data or not
+    n_articles_extracted = len(articles_filtered_by_keywords)
 
     if n_articles_extracted > 0:
+        # Step 6: Convert datetime columns to strings, if any
+        final_articles = convert_datetime_columns_to_str(
+            articles_filtered_by_keywords, string_format=news_config.DATE_STRING_FORMAT
+        )
+
+        # Step 7: Save the data in an excel file
         logger.info(f"Storing {n_articles_extracted} news into an Excel file...")
         store_df_to_excel(
-            df=articles_filtered_by_keywords,
+            df=final_articles,
             local_file_path=local_file_path,
             sheet_name=excel_sheet_name,
             table_name=excel_table_name,

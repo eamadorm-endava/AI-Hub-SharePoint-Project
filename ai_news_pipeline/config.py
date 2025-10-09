@@ -94,6 +94,13 @@ class AINewsConfig(BaseSettings):
             description="Name of the DataFrame column to filter by date",
         ),
     ]
+    DATE_STRING_FORMAT: Annotated[
+        str,
+        Field(
+            default=r"%Y-%m-%dT%H:%M:%SZ",
+            description="String format representing the datetime value",
+        ),
+    ]
     COLUMN_TO_FILTER_BY_KW: Annotated[
         str,
         Field(

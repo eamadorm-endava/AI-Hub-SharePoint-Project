@@ -178,3 +178,45 @@ def filter_by_date_threshold(
     )
 
     return df_copy
+
+
+def convert_datetime_columns_to_str(
+    df: pd.DataFrame, string_format: str
+) -> Optional[pd.DataFrame]:
+    """
+    Converts all the datetime columns to string columns in the final format defined
+
+    Args:
+        df: pd.DataFrame -> DataFrame containing datetime columns
+        string_format: str -> String format representing the datetime value
+
+    Returns:
+        Optional[pd.DataFrame]
+    """
+    if not isinstance(df, pd.DataFrame):
+        logger.error("The parameter 'df' must be a pandas DataFrame.")
+        return
+
+    if not isinstance(string_format, str) or string_format.strip() == "":
+        logger.error("The parameter 'string_format' must be a non-empty string.")
+        return
+
+    df_copy = df.copy()
+
+    datetime_cols = df_copy.select_dtypes(
+        include=["datetime64[ns]", "datetime64[ns, UTC]"]
+    ).columns
+
+    if not datetime_cols.any():
+        logger.warning("No datetime columns found to convert.")
+        return df_copy
+
+    logger.info(f"Converting datetime columns to string format: {string_format}")
+    logger.debug(f"Detected datetime columns: {list(datetime_cols)}")
+
+    for col in datetime_cols:
+        df_copy[col] = df_copy[col].dt.strftime(string_format)
+
+    logger.info("Datetime conversion complete.")
+
+    return df_copy
