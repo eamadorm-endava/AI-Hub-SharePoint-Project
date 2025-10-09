@@ -59,6 +59,7 @@ def main(
         df=articles_filtered_by_date,
         case_insen_search_kw=case_insen_search_kw,
         case_sen_search_kw=case_sen_search_kw,
+        filter_column=news_config.COLUMN_TO_FILTER_BY_KW,
     )
 
     # Step 5: Store the filtered news articles to an Excel file
