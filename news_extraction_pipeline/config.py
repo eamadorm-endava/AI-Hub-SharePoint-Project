@@ -68,28 +68,6 @@ class AINewsConfig(BaseSettings):
             description="Pattern to get the base url",
         ),
     ]
-    FILE_PATH: Annotated[
-        str,
-        Field(
-            default="path-to-local-storage.xlsx",
-            description="The local file path to store the AI news Excel file.",
-            pattern=r".*\.xlsx$",
-        ),
-    ]
-    EXCEL_SHEET_NAME: Annotated[
-        str,
-        Field(
-            default="AI-News",
-            description="Name of the excel sheet where the data will be stored",
-        ),
-    ]
-    EXCEL_TABLE_NAME: Annotated[
-        str,
-        Field(
-            default="RecentAINews",
-            description="Name of the excel table where the data will be stored",
-        ),
-    ]
     DATE_COLUMN: Annotated[
         str,
         Field(
