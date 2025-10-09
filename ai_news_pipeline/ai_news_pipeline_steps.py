@@ -130,7 +130,7 @@ def filter_by_keywords(
     return df_copy
 
 
-def filter_by_age(
+def filter_by_date_threshold(
     df: pd.DataFrame, filter_column: str, max_days_old: int
 ) -> pd.DataFrame:
     """
