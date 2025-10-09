@@ -1,3 +1,4 @@
+import concurrent.futures
 import pandas as pd
 from loguru import logger
 from typing import Optional
@@ -12,6 +13,47 @@ def extract_from_feed(feed_url: str) -> Optional[pd.DataFrame]:
     extractor.set_current_feed_url(feed_url)
 
     return extractor.get_articles()
+
+
+def extract_from_multiple_feed_urls(feed_urls: list[str]) -> Optional[pd.DataFrame]:
+    """
+    Extract the articles from different feed urls using parallelization
+
+    Args:
+        feed_urls: list[str] -> List of feed_urls
+
+    Returns:
+        all_articles: Optional[pd.DataFrame] -> DataFrame containing all the articles
+                                            from all the different feed urls
+    """
+    if not isinstance(feed_urls, list):
+        logger.error("feed_urls must be a list of feed urls")
+        return
+    if not all(isinstance(url, str) and url != "" for url in feed_urls):
+        logger.error("All the entries of the feed_urls list must be not null strings")
+        return
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_url = {
+            executor.submit(extract_from_feed, url): url for url in feed_urls
+        }
+        results = list()
+
+        for future in concurrent.futures.as_completed(future_to_url):
+            url = future_to_url[future]
+
+            try:
+                data = future.result()
+                if isinstance(data, pd.DataFrame):
+                    results.append(data)
+
+            except Exception as e:
+                logger.error(f"Error extracting articles from {url}: {e}")
+
+    if results:
+        return pd.concat(results)
+
+    logger.error("No articles were extracted from any source")
 
 
 def filter_by_keywords(
