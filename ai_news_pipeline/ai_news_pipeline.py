@@ -130,7 +130,7 @@ if __name__ == "__main__":
     main(
         case_sen_search_kw=args.case_sen_search_kw,  # '-' become '_'
         case_insen_search_kw=args.case_insen_search_kw,
-        max_days_old=args.days_back,
+        max_days_old=args.max_days_old,
         local_file_path=args.local_file_path,
         excel_sheet_name=args.excel_sheet_name,
         excel_table_name=args.excel_table_name,
