@@ -3,8 +3,9 @@ import argparse
 
 from ai_news_pipeline.config import AINewsConfig
 from ai_news_pipeline.ai_news_pipeline_steps import (
-    retrieve_ai_news,
-    filter_news_by_date,
+    extract_from_multiple_feed_urls,
+    filter_by_date_threshold,
+    filter_by_keywords,
 )
 from utils.io_utils import store_df_to_excel
 
@@ -15,7 +16,7 @@ news_config = AINewsConfig()
 def main(
     case_sen_search_kw: list[str],
     case_insen_search_kw: list[str],
-    days_back: int,
+    max_days_old: int,
     local_file_path: str,
     excel_sheet_name: str,
     excel_table_name: str,
@@ -27,7 +28,7 @@ def main(
     Args:
         case_sen_search_kw: list[str] -> List of case sensitive keywords to filter the AI-news by,
         case_insen_search_kw: list[str] -> List of case insensitive keywords to filter the AI-news by,
-        days_back: int -> Number of days that you want to retrieve the data from
+        max_days_old: int -> Number of days that you want to retrieve the data from
                             (e.g. 2 -> Get the news from the last 2 days),
         local_file_path: str -> Local path where the excel file generated will be stored
                             (e.g. -> local-file-path/file_name.xlsx)
@@ -36,29 +37,37 @@ def main(
     """
     logger.info("Starting AI news retrieval process...")
 
-    # Step 1: Retrieve AI news from RSS feed
-    logger.info("Fetching AI news from RSS feed...")
-    ai_news = retrieve_ai_news(
-        url=news_config.NEWS_URL,
-        case_sen_search_kw=case_sen_search_kw,
+    # Step 1: Retrieve all the feed_urls registered in AINewsConfig class
+    news_config_dict = news_config.model_dump()
+    news_sources = [
+        val for key, val in news_config_dict.items() if key.endswith("_FEED_URL")
+    ]
+
+    # Step 2: Get all the articles available from the different sources found
+    all_articles = extract_from_multiple_feed_urls(news_sources)
+
+    # Step 3: Filter news articles by date (last 2 days)
+    logger.info(f"Filtering news articles from the last {max_days_old} days...")
+    articles_filtered_by_date = filter_by_date_threshold(
+        df=all_articles,
+        filter_column=news_config.DATE_COLUMN,
+        max_days_old=max_days_old,
+    )
+
+    # Step 4: Filter news articles by search keywords
+    articles_filtered_by_keywords = filter_by_keywords(
+        df=articles_filtered_by_date,
         case_insen_search_kw=case_insen_search_kw,
-    )
-    logger.info(f"Retrieved {len(ai_news)} news articles:")
-
-    # Step 2: Filter news articles by date (last 2 days)
-    logger.info(f"Filtering news articles from the last {days_back} days...")
-    ai_news = filter_news_by_date(
-        df=ai_news, date_column=news_config.DATE_COLUMN, days=days_back
+        case_sen_search_kw=case_sen_search_kw,
     )
 
-    n_news_extracted = len(ai_news)
-    logger.info(f"{n_news_extracted} articles remain after date filtering.")
+    # Step 5: Store the filtered news articles to an Excel file
+    n_articles_extracted = len(articles_filtered_by_date)
 
-    if n_news_extracted > 0:
-        # Step 3: Store the filtered news articles to an Excel file
-        logger.info(f"Storing {n_news_extracted} news into an Excel file...")
+    if n_articles_extracted > 0:
+        logger.info(f"Storing {n_articles_extracted} news into an Excel file...")
         store_df_to_excel(
-            df=ai_news,
+            df=articles_filtered_by_keywords,
             local_file_path=local_file_path,
             sheet_name=excel_sheet_name,
             table_name=excel_table_name,
@@ -91,15 +100,16 @@ if __name__ == "__main__":
         help="Keywords to filter the news from (expected input: 'AI,Machine Learning,NLP')",
     )
     parser.add_argument(
-        "--days-back",
+        "--max-days-old",
         type=int,
-        default=news_config.DAYS_BACK,
-        help="Number of days in the past to back and retrieve the news from. example: 2 -> Get the news from the last 2 days",
+        default=news_config.MAX_DAYS_OLD,
+        help="Maximum number of days to look back when retrieving news articles."
+        "For example, 2 means only articles published in the last 2 days will be included.",
     )
     parser.add_argument(
         "--local-file-path",
         type=str,
-        default=news_config.AI_NEWS_FILE_PATH,
+        default=news_config.FILE_PATH,
         help="Path where the excel file will be stored",
     )
     parser.add_argument(
@@ -120,7 +130,7 @@ if __name__ == "__main__":
     main(
         case_sen_search_kw=args.case_sen_search_kw,  # '-' become '_'
         case_insen_search_kw=args.case_insen_search_kw,
-        days_back=args.days_back,
+        max_days_old=args.days_back,
         local_file_path=args.local_file_path,
         excel_sheet_name=args.excel_sheet_name,
         excel_table_name=args.excel_table_name,
