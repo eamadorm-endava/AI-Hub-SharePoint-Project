@@ -1,5 +1,17 @@
 import pandas as pd
 from loguru import logger
+from typing import Optional
+from ai_news_pipeline.extractors.news.news_extractors import NewsExtractor
+
+
+def extract_from_feed(feed_url: str) -> Optional[pd.DataFrame]:
+    """
+    Extracts articles from a specific feed_url
+    """
+    extractor = NewsExtractor()
+    extractor.set_current_feed_url(feed_url)
+
+    return extractor.get_articles()
 
 
 def filter_by_keywords(
