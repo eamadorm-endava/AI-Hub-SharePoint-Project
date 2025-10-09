@@ -1,13 +1,13 @@
 from loguru import logger
 import re
 from typing import Optional, Type
-from ai_news_pipeline.extractors.image_url.image_url_extractors import (
+from news_extraction_pipeline.extractors.image_url.image_url_extractors import (
     BaseImageExtractor,
     AINEWSImageExtractor,
     MITImageExtractor,
 )
 
-from ai_news_pipeline.config import AINewsConfig
+from news_extraction_pipeline.config import AINewsConfig
 
 news_config = AINewsConfig()
 

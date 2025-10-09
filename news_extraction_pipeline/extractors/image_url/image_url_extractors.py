@@ -5,7 +5,7 @@ from loguru import logger
 from typing import Optional
 import re
 
-from ai_news_pipeline.config import AINewsConfig
+from news_extraction_pipeline.config import AINewsConfig
 
 
 news_config = AINewsConfig()

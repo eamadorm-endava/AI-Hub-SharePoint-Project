@@ -1,8 +1,8 @@
 from loguru import logger
 import argparse
 
-from ai_news_pipeline.config import AINewsConfig
-from ai_news_pipeline.ai_news_pipeline_steps import (
+from news_extraction_pipeline.config import AINewsConfig
+from news_extraction_pipeline.pipeline_steps import (
     extract_from_multiple_feed_urls,
     filter_by_date_threshold,
     filter_by_keywords,
