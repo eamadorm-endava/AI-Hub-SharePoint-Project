@@ -1,4 +1,4 @@
-## AI-News Extraction Pipeline
+# AI-News Extraction Pipeline
 
 This module is the first stage of the complete AI-News Pipeline.
 
