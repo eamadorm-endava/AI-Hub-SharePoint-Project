@@ -1,5 +1,59 @@
+import concurrent.futures
 import pandas as pd
 from loguru import logger
+from typing import Optional
+from ai_news_pipeline.extractors.news.news_extractors import NewsExtractor
+
+
+def extract_from_feed(feed_url: str) -> Optional[pd.DataFrame]:
+    """
+    Extracts articles from a specific feed_url
+    """
+    extractor = NewsExtractor()
+    extractor.set_current_feed_url(feed_url)
+
+    return extractor.get_articles()
+
+
+def extract_from_multiple_feed_urls(feed_urls: list[str]) -> Optional[pd.DataFrame]:
+    """
+    Extract the articles from different feed urls using parallelization
+
+    Args:
+        feed_urls: list[str] -> List of feed_urls
+
+    Returns:
+        all_articles: Optional[pd.DataFrame] -> DataFrame containing all the articles
+                                            from all the different feed urls
+    """
+    if not isinstance(feed_urls, list):
+        logger.error("feed_urls must be a list of feed urls")
+        return
+    if not all(isinstance(url, str) and url != "" for url in feed_urls):
+        logger.error("All the entries of the feed_urls list must be not null strings")
+        return
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_url = {
+            executor.submit(extract_from_feed, url): url for url in feed_urls
+        }
+        results = list()
+
+        for future in concurrent.futures.as_completed(future_to_url):
+            url = future_to_url[future]
+
+            try:
+                data = future.result()
+                if isinstance(data, pd.DataFrame):
+                    results.append(data)
+
+            except Exception as e:
+                logger.error(f"Error extracting articles from {url}: {e}")
+
+    if results:
+        return pd.concat(results)
+
+    logger.error("No articles were extracted from any source")
 
 
 def filter_by_keywords(
@@ -76,7 +130,7 @@ def filter_by_keywords(
     return df_copy
 
 
-def filter_by_age(
+def filter_by_date_threshold(
     df: pd.DataFrame, filter_column: str, max_days_old: int
 ) -> pd.DataFrame:
     """
@@ -122,5 +176,47 @@ def filter_by_age(
         f"Date filtering complete. {len(df_copy)} articles "
         "published within the allowed range."
     )
+
+    return df_copy
+
+
+def convert_datetime_columns_to_str(
+    df: pd.DataFrame, string_format: str
+) -> Optional[pd.DataFrame]:
+    """
+    Converts all the datetime columns to string columns in the final format defined
+
+    Args:
+        df: pd.DataFrame -> DataFrame containing datetime columns
+        string_format: str -> String format representing the datetime value
+
+    Returns:
+        Optional[pd.DataFrame]
+    """
+    if not isinstance(df, pd.DataFrame):
+        logger.error("The parameter 'df' must be a pandas DataFrame.")
+        return
+
+    if not isinstance(string_format, str) or string_format.strip() == "":
+        logger.error("The parameter 'string_format' must be a non-empty string.")
+        return
+
+    df_copy = df.copy()
+
+    datetime_cols = df_copy.select_dtypes(
+        include=["datetime64[ns]", "datetime64[ns, UTC]"]
+    ).columns
+
+    if not datetime_cols.any():
+        logger.warning("No datetime columns found to convert.")
+        return df_copy
+
+    logger.info(f"Converting datetime columns to string format: {string_format}")
+    logger.debug(f"Detected datetime columns: {list(datetime_cols)}")
+
+    for col in datetime_cols:
+        df_copy[col] = df_copy[col].dt.strftime(string_format)
+
+    logger.info("Datetime conversion complete.")
 
     return df_copy

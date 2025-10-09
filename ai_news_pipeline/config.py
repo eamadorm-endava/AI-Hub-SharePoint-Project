@@ -87,6 +87,27 @@ class AINewsConfig(BaseSettings):
             ge=1,
         ),
     ]
+    DATE_COLUMN: Annotated[
+        str,
+        Field(
+            default="publish_date",
+            description="Name of the DataFrame column to filter by date",
+        ),
+    ]
+    DATE_STRING_FORMAT: Annotated[
+        str,
+        Field(
+            default=r"%Y-%m-%dT%H:%M:%SZ",
+            description="String format representing the datetime value",
+        ),
+    ]
+    COLUMN_TO_FILTER_BY_KW: Annotated[
+        str,
+        Field(
+            default="title",
+            description="Name of the column that will be filtered by keywords",
+        ),
+    ]
 
     # To force to read .env file
     class Config:

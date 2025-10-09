@@ -151,7 +151,11 @@ class NewsExtractor:
             logger.info(f"{len(extracted_articles)} articles extracted")
             articles = pd.DataFrame(extracted_articles)
 
-            articles.publish_date = pd.to_datetime(articles.publish_date)
+            # publish_date might have different timezones, so I pass them all to the
+            # UTC - 00:00 timezone
+            articles.publish_date = pd.to_datetime(articles.publish_date).dt.tz_convert(
+                "UTC"
+            )
 
             self.__current_data = articles
             self.__previous_feed_url = self.__current_feed_url
