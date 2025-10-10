@@ -10,7 +10,7 @@ Currently working on three main automations:
 
 - [*agent/*](agent/) - Status: Awaiting for approval
 
-## Repository Structure
+## Repository Structure 
 
 - *agent/*: Folder containing all the code related to the AI-agent
 - *events_extraction_pipeline/*: Extraction and publication of AI-related events 
