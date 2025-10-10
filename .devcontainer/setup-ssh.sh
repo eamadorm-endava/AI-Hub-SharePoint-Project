@@ -28,6 +28,7 @@ fi
 
 # 2. Configure Git to use the safe copy if it exists
 if [[ -f "$SSH_CONFIG_SAFE" ]]; then
+
   # Allow this repo to change ssh file, does not rewrite .gitconfig but local git config
   git config core.sshCommand "ssh -F $SSH_CONFIG_SAFE" 
   echo "Git configured to use safe SSH config"
