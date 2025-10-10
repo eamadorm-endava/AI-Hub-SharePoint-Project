@@ -1,3 +1,11 @@
+# This script allows to use ssh as authentication
+# The ssh keys must be previously configured in your local machine 
+# Once this script is done, configure git to know who are you with
+#
+#  - git config --global user.name "Your name"
+#  - git config --global user.email "your_email@email.com"
+#  - git config --global user.signingkey $HOME/.ssh/ssh_key_name.pub
+
 #!/bin/bash
 set -euo pipefail
 
