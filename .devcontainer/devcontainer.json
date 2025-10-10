@@ -21,7 +21,7 @@
 		}
 	},
 
-		// To use ssh credentials
+		// To use ssh credentials 
 	"mounts": [
   		"source=${env:USERPROFILE}\\.ssh,target=/home/vscode/.ssh,type=bind", // bring your ssh configuration
 	]
