@@ -18,6 +18,15 @@ else
   echo "SSH config not found at $CONFIG_SRC — skipping copy"
 fi
 
+# 1. Copy .gitconfig if it exists
+if [[ -f "$CONFIG_SRC" ]]; then
+  cp "$CONFIG_SRC" "$CONFIG_SAFE"
+  chmod 600 "$CONFIG_SAFE"
+  echo "Copied SSH config to $CONFIG_SAFE"
+else
+  echo "SSH config not found at $CONFIG_SRC — skipping copy"
+fi
+
 # 2. Configure Git to use the safe copy if it exists
 if [[ -f "$CONFIG_SAFE" ]]; then
   git config --global core.sshCommand "ssh -F $CONFIG_SAFE"

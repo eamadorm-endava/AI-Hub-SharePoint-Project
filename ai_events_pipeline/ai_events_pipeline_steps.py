@@ -7,6 +7,7 @@ from loguru import logger
 from ai_events_pipeline.events_auxiliars import get_initial_and_final_dates
 
 
+
 def retrieve_ai_events(events_url: str) -> list[dict]:
     """
     Fetches AI event data from a webpage and returns it as a list of dictionaries, each dictionary is an event.
