@@ -24,7 +24,7 @@
 	// To use ssh credentials 
 	"mounts": [
   		"source=${env:USERPROFILE}\\.ssh,target=/home/vscode/.ssh,type=bind", // bring your ssh configuration
-	]
+	] 
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
