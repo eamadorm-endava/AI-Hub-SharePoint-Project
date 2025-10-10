@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Annotated
 
 
@@ -6,7 +6,14 @@ class PipelineArgs(BaseModel):
     case_sen_search_kw: Annotated[
         list[str],
         Field(
-            default=[" AI ", "AI ", "AI ", "A.I.", " AI-", "AI-"],
+            default=[
+                " AI ",
+                "AI ",
+                "AI ",
+                "A.I.",
+                " AI-",
+                "AI-",
+            ],  # In case this field is not included
             description="List of keywords to filter AI News articles by. This will be an exact match",
         ),
     ]
@@ -34,7 +41,7 @@ class PipelineArgs(BaseModel):
             description="List of keywords to filter AI news articles. This will be matched no matter the case",
         ),
     ]
-    max_days_old = Annotated[
+    max_days_old: Annotated[
         int,
         Field(
             default=2,
@@ -42,3 +49,16 @@ class PipelineArgs(BaseModel):
             ge=1,
         ),
     ]
+
+    @field_validator("case_sen_search_kw", "case_insen_search_kw", mode="after")
+    @classmethod
+    def no_empty_kw(cls, kw_list: list[str]) -> list[str]:
+        cleaned = [kw.strip() for kw in kw_list if kw.strip()]
+
+        if not cleaned:
+            raise ValueError(
+                "Both, case_sen_search_kw and case_insen_search_kw must "
+                "contain at least one non-empty string value"
+            )
+
+        return cleaned
