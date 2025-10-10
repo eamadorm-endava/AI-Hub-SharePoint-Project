@@ -3,7 +3,7 @@ import pandas as pd
 from loguru import logger
 from typing import Type, Optional
 
-from news_extraction_pipeline.selectors.extractor_selector import (
+from news_extraction_pipeline.extractor_selectors.extractor_selector import (
     ImageExtractorSelector,
 )
 from news_extraction_pipeline.extractors.image_url.image_url_extractors import (
