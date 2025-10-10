@@ -83,3 +83,7 @@ Contains the logic for extracting data from RSS feeds and image URLs from news a
 ### [extractor_selectors/](/news_extraction_pipeline/extractor_selectors/)
 
 Contains the bridge logic for dynamically selecting the appropriate extractor class.
+
+### [app/](/news_extraction_pipeline/app/)
+
+API module
