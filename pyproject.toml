@@ -26,10 +26,12 @@ azure-libraries = [
 dev = [
     "argparse>=1.4.0",
     "datetime>=5.5",
+    "fastapi>=0.118.2",
     "loguru>=0.7.3",
     "pre-commit>=4.3.0",
     "pydantic>=2.11.9",
     "pydantic-settings>=2.11.0",
+    "uvicorn>=0.37.0",
 ]
 notebooks = [
     "dotenv>=0.9.9",

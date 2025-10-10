@@ -80,6 +80,10 @@ The pipeline is designed with modularity and extensibility in mind, allowing eac
 
 Contains the logic for extracting data from RSS feeds and image URLs from news articles.
 
-### [selectors/](/news_extraction_pipeline/selectors/)
+### [extractor_selectors/](/news_extraction_pipeline/extractor_selectors/)
 
 Contains the bridge logic for dynamically selecting the appropriate extractor class.
+
+### [app/](/news_extraction_pipeline/app/)
+
+API module

@@ -1,4 +1,4 @@
-# Selectors Module
+# Extractor Selectors Module
 
 The ImageExtractorSelector class is responsible for dynamically selecting the appropriate image extractor based on the base URL of a news article. It acts as a bridge between the feed URL and the correct scraping logic, ensuring that each article is enriched with its corresponding image link.
 

@@ -25,68 +25,6 @@ class AINewsConfig(BaseSettings):
             description="Pattern to get the base url",
         ),
     ]
-    FILE_PATH: Annotated[
-        str,
-        Field(
-            default="path-to-local-storage.xlsx",
-            description="The local file path to store the AI news Excel file.",
-            pattern=r".*\.xlsx$",
-        ),
-    ]
-    EXCEL_SHEET_NAME: Annotated[
-        str,
-        Field(
-            default="AI-News",
-            description="Name of the excel sheet where the data will be stored",
-        ),
-    ]
-    EXCEL_TABLE_NAME: Annotated[
-        str,
-        Field(
-            default="RecentAINews",
-            description="Name of the excel table where the data will be stored",
-        ),
-    ]
-    CASE_INSEN_SEARCH_KW: Annotated[
-        list[str],
-        Field(
-            default=[
-                "Artificial Intelligence",
-                "Machine Learning",
-                "Deep Learning",
-                "Neural Networks",
-                "NLP",
-                "Computer Vision",
-                "Data Science",
-                "Gemini",
-                "Bard",
-                "ChatGPT",
-                "GPT-4",
-                "DALL-E",
-                "MidJourney",
-                "Stable Diffusion",
-                "Claude",
-                "LLaMA",
-                "Whisper",
-            ],
-            description="List of keywords to filter AI news articles. This will be matched no matter the case",
-        ),
-    ]
-    CASE_SEN_SEARCH_KW: Annotated[
-        list[str],
-        Field(
-            default=[" AI ", "AI ", "AI ", "A.I.", " AI-", "AI-"],
-            description="List of keywords to filter AI News articles by. This will be an exact match",
-        ),
-    ]
-    MAX_DAYS_OLD: Annotated[
-        int,
-        Field(
-            default=2,
-            description="Maximum number of days since publication.",
-            ge=1,
-        ),
-    ]
     DATE_COLUMN: Annotated[
         str,
         Field(

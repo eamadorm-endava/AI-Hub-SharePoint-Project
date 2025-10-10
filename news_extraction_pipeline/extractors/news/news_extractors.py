@@ -3,44 +3,26 @@ import pandas as pd
 from loguru import logger
 from typing import Type, Optional
 
-from news_extraction_pipeline.config import AINewsConfig
-from news_extraction_pipeline.selectors.extractor_selector import (
+from news_extraction_pipeline.extractor_selectors.extractor_selector import (
     ImageExtractorSelector,
 )
 from news_extraction_pipeline.extractors.image_url.image_url_extractors import (
     BaseImageExtractor,
 )
 
-news_config = AINewsConfig()
-
 
 class NewsExtractor:
     __img_extr_selector: ImageExtractorSelector = ImageExtractorSelector()
 
-    def __init__(
-        self,
-        case_sen_search_kw: list[str] = news_config.CASE_SEN_SEARCH_KW,
-        case_insen_search_kw: list[str] = news_config.CASE_INSEN_SEARCH_KW,
-        max_days_old: int = news_config.MAX_DAYS_OLD,
-    ):
+    def __init__(self):
         """
         Initializes a NewsExtractor instance.
-
-        Args:
-            case_sen_search_kw: list[str] → Case-sensitive keywords for filtering titles.
-            case_insen_search_kw: list[str] → Case-insensitive keywords for filtering titles.
-            max_days_old: int → Maximum age (in days) allowed for articles.
         """
         # Private attributes, which cannot be directly accessed from the outside
         self.__current_feed_url: Optional[str] = None
         self.__previous_feed_url: Optional[str] = None
         self.__img_extractor: Optional[Type[BaseImageExtractor]] = None
         self.__current_data: Optional[pd.DataFrame] = None
-
-        # Public attributes, can be directly accessed from the outside
-        self.case_sen_search_kw: list[str] = case_sen_search_kw
-        self.case_insen_search_kw: list[str] = case_insen_search_kw
-        self.max_days_old: int = max_days_old
 
     # @property -> to create a read-only attribute without exposing the real one.
     # Won't be allowed to set the attribute:
