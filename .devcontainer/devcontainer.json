@@ -24,7 +24,7 @@
 	// To use ssh credentials 
 	"mounts": [
   		"source=${env:USERPROFILE}\\.ssh,target=/home/vscode/.ssh,type=bind" // bring your ssh configuration
-	] 
+	],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -33,7 +33,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postCreateCommand": "bash .devcontainer/setup-ssh.sh"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
