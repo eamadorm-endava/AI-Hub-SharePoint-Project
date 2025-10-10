@@ -5,31 +5,22 @@ echo "Setting up SSH config and Git signing..."
 
 # Define paths
 SSH_DIR="$HOME/.ssh"
-CONFIG_SRC="$SSH_DIR/config"
-CONFIG_SAFE="$SSH_DIR/config-devcontainer"
+SSH_CONFIG_SRC="$SSH_DIR/config"
+SSH_CONFIG_SAFE="$SSH_DIR/config-devcontainer"
 KEY_PATH="$SSH_DIR/id_ed25519"
 
 # 1. Copy SSH config if it exists
-if [[ -f "$CONFIG_SRC" ]]; then
-  cp "$CONFIG_SRC" "$CONFIG_SAFE"
-  chmod 600 "$CONFIG_SAFE"
-  echo "Copied SSH config to $CONFIG_SAFE"
+if [[ -f "$SSH_CONFIG_SRC" ]]; then
+  cp "$SSH_CONFIG_SRC" "$SSH_CONFIG_SAFE"
+  chmod 600 "$SSH_CONFIG_SAFE"
+  echo "Copied SSH config to $SSH_CONFIG_SAFE"
 else
-  echo "SSH config not found at $CONFIG_SRC — skipping copy"
-fi
-
-# 1. Copy .gitconfig if it exists
-if [[ -f "$CONFIG_SRC" ]]; then
-  cp "$CONFIG_SRC" "$CONFIG_SAFE"
-  chmod 600 "$CONFIG_SAFE"
-  echo "Copied SSH config to $CONFIG_SAFE"
-else
-  echo "SSH config not found at $CONFIG_SRC — skipping copy"
+  echo "SSH config not found at $SSH_CONFIG_SRC — skipping copy"
 fi
 
 # 2. Configure Git to use the safe copy if it exists
-if [[ -f "$CONFIG_SAFE" ]]; then
-  git config --global core.sshCommand "ssh -F $CONFIG_SAFE"
+if [[ -f "$SSH_CONFIG_SAFE" ]]; then
+  git config --global core.sshCommand "ssh -F $SSH_CONFIG_SAFE"
   echo "Git configured to use safe SSH config"
 else
   echo "Safe SSH config not found — skipping sshCommand override"
