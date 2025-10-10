@@ -7,21 +7,24 @@
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {
 			"ppa": true,
-			"version": "latest"
+			"version": "os-provided"
+		},
+		"ghcr.io/devcontainers/features/terraform:1": {
+			"version": "latest",
+			"tflint": "latest",
+			"terragrunt": "latest"
 		},
 		"ghcr.io/dhoeric/features/google-cloud-cli:1": {},
 		"ghcr.io/jungaretti/features/make:1": {},
-		"ghcr.io/devcontainers-extra/features/uv:1": {
+		"ghcr.io/va-h/devcontainers-features/uv:1": {
 			"version": "latest"
-		},
-		"ghcr.io/devcontainers/features/terraform:1": {}
+		}
 	},
 
-	// To use ssh credentials
+		// To use ssh credentials
 	"mounts": [
   		"source=${env:USERPROFILE}\\.ssh,target=/home/vscode/.ssh,type=bind", // bring your ssh configuration
-		"source=${env:USERPROFILE}\\.gitconfig,target=/home/vscode/.gitconfig,type=bind" // bring your git configuration
-	],
+	]
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -30,7 +33,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bash .devcontainer/setup-ssh.sh"
+	// "postCreateCommand": "pip3 install --user -r requirements.txt",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
