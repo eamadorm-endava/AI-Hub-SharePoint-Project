@@ -1,93 +1,27 @@
-
-# agent_identity is an admin entity that allows Azure resources (e.g. VM, Azure Function, etc) to automatically 
-# authenticate agains other Azure services without the need of credentials of secrets
-resource "azurerm_user_assigned_identity" "agent_identity" {
-  name                = "agent-identity"
-  location            = var.resources_location
-  resource_group_name = var.resource_group_name
-
-  tags = {
-    Tower   = var.tag_tower
-    Owner   = var.tag_owner
-    project = var.tag_project
-  }
+provider "google" {
+  project = var.gcp_project_id
+  region  = var.gcp_region
+  zone    = var.gcp_zone
 }
 
-resource "azurerm_key_vault" "main-key-vault" {
-  name                       = "ai-hub-key-vault-endava"
-  location                   = var.resources_location
-  resource_group_name        = var.resource_group_name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "standard"
-  soft_delete_retention_days = 7
-  purge_protection_enabled   = true
 
-  tags = {
-    Tower   = var.tag_tower
-    Owner   = var.tag_owner
-    project = var.tag_project
-  }
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = azurerm_user_assigned_identity.agent_identity.principal_id
-
-    secret_permissions = [
-      "Get",
-      "List",
-      "Set",
-      "Delete"
-    ]
-  }
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
-    secret_permissions = [
-      "Get",
-      "List",
-      "Set",
-      "Delete"
-    ]
-  }
-
-}
-################################################################### App Registration ######################################################################
-# Microsoft Entra ID (Azure AD) Application registration for the AI Hub application
-
-# Main module to create an app registration in MS Entra ID (Azure AD)
-resource "azuread_application" "ai-hub-app" {
-  display_name = "ai-hub-app-ms-entra"
-  description  = "App registration for the AI Hub application to access SharePoint Online"
-  owners       = [data.azurerm_client_config.current.object_id]
-
-  required_resource_access {
-
-    resource_app_id = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
-
-    resource_access {
-      id   = "9492366f-7969-46a4-8d15-ed1a20078fff" # Sites.ReadWrite.All
-      type = "Role"
+############### ARTIFACT REGISTRY ###############
+resource "google_artifact_registry_repository" "ai-hub-sharepoint" {
+  location               = var.gcp_region
+  repository_id          = var.artifact_registry_name
+  format                 = "docker"
+  cleanup_policy_dry_run = var.artifact_registry_dry_run
+  cleanup_policies {
+    id     = "delete_untagged_images"
+    action = "DELETE"
+    condition {
+      tag_state  = "UNTAGGED"
+      older_than = "3d" # after 3 days untagged, delete the image 
     }
   }
-}
-
-# Creation of the service principal for the app registration. 
-# This is required to assign roles to the app registration
-resource "azuread_service_principal" "ai-hub-sp" {
-  client_id = azuread_application.ai-hub-app.client_id
-  owners    = [data.azurerm_client_config.current.object_id]
-}
-
-# Secret credential for the App (client secret)
-resource "azuread_application_password" "ai-hub-secret" {
-  application_id = azuread_application.ai-hub-app.id
-  display_name   = "ai-hub-secret"
-}
-
-# Store the secret credential value in Key Vault
-resource "azurerm_key_vault_secret" "ai-hub-client-secret" {
-  name         = "AI-HUB-CLIENT-SECRET"
-  value        = azuread_application_password.ai-hub-secret.value
-  key_vault_id = azurerm_key_vault.main-key-vault.id
+  # Check documentation for vulnerability scanning
+  # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/artifact_registry_repository.html#nested_vulnerability_scanning_config
+  vulnerability_scanning_config {
+    enablement_config = "DISABLED"
+  }
 }
