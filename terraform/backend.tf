@@ -1,8 +1,9 @@
+# Due to terraform will be executed in a CI/CD, and each step is 
+# executed in a container. Every time the terraform apply is executed, the tf.state
+# is lost when the container is turned off. So the tf.state needs to exists in gcs
 terraform {
-  backend "azurerm" {
-    resource_group_name  = "ai-hub-sharepoint"
-    storage_account_name = "endavaaihubstorage"
-    container_name       = "ai-hub-storage-container"
-    key                  = "terraform.tfstate"
+  backend "gcs" {
+    bucket = "eamadorm-tf-bucket"
+    prefix = "terraform/state"
   }
 }

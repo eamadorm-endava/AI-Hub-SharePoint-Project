@@ -1,48 +1,30 @@
-variable "azure_subscription_id" {
+variable "gcp_project_id" {
   type        = string
-  description = "Azure subscription ID where the resources will be created."
-  default     = "15158422-ef98-425f-a0e3-6e53c81ba478"
+  description = "GCP Project ID"
+  default     = "p-dev-gce-60pf"
 }
 
-variable "tag_owner" {
+variable "gcp_region" {
   type        = string
-  description = "Value of the tag 'Owner'"
-  default     = "Emmanuel_Amador"
+  description = "Region where the resources will be stored"
+  default     = "northamerica-south1"
 }
 
-variable "tag_tower" {
+
+variable "gcp_zone" {
   type        = string
-  description = "Value of the tag 'Tower'"
-  default     = "Infrastructure"
+  description = "GCP zone within the gcp_region"
+  default     = "northamerica-south1-a"
 }
 
-variable "tag_project" {
+variable "artifact_registry_name" {
   type        = string
-  description = "Value of the tag 'project'"
+  description = "Name of the artifact registry to create"
   default     = "ai-hub-sharepoint"
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "Name of the main resource group. Manually created"
-  default     = "ai-hub-sharepoint"
-}
-
-variable "resources_location" {
-  type        = string
-  description = "Location of the resources"
-  default     = "Mexico Central"
-
-}
-
-variable "storage_account_name" {
-  type        = string
-  description = "Name of the storage account. Manually created"
-  default     = "endavaaihubstorage"
-}
-
-variable "storage_container" {
-  type        = string
-  description = "Name of the storage container. Manually created"
-  default     = "ai-hub-storage-container"
+variable "artifact_registry_dry_run" {
+  type        = bool
+  description = "Determines if cleanup policies delete artifacts. true: No artifacts are deleted. false: Artifacts are deleted or kept depending on the policies"
+  default     = false
 }
