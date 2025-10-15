@@ -5,7 +5,7 @@ provider "google" {
 }
 
 
-############### ARTIFACT REGISTRY ###############
+############## ARTIFACT REGISTRY ###############
 
 # Make sure docker is connected to the artifact
 # check this: https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling
@@ -29,7 +29,7 @@ resource "google_artifact_registry_repository" "ai-hub-sharepoint" {
   }
 }
 
-################# CloudRun - News Extraction Pipeline API ###################
+# ################# CloudRun - News Extraction Pipeline API ###################
 
 resource "google_cloud_run_v2_service" "news_extraction_pipeline" {
   name                = var.news_extraction_pipeline_instance
@@ -38,8 +38,6 @@ resource "google_cloud_run_v2_service" "news_extraction_pipeline" {
   deletion_protection = false
 
   template {
-    # Service account that the container will use to authenticate with GCP
-    service_account = var.gcp_dev_sa
 
     containers {
       image = "${var.gcp_region}-docker.pkg.dev/${var.gcp_project_id}/${var.artifact_registry_name}/${var.news_extraction_pipeline_image_name}:${var.news_extraction_pipeline_image_tag}"

@@ -1,13 +1,13 @@
 variable "gcp_project_id" {
   type        = string
   description = "GCP Project ID"
-  default     = "learned-stone-454021-c8"
+  default     = "p-dev-gce-60pf"
 }
 
 variable "gcp_dev_sa" {
   type        = string
   description = "GCP Service Account that CloudRun will use to authenticate"
-  default     = "dev-service-account@learned-stone-454021-c8.iam.gserviceaccount.com"
+  default     = "dev-service-account@p-dev-gce-60pf.iam.gserviceaccount.com"
 }
 
 variable "gcp_region" {

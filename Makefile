@@ -1,5 +1,5 @@
-GCP_PROJECT_ID="learned-stone-454021-c8"
-GCP_SA="dev-service-account@learned-stone-454021-c8.iam.gserviceaccount.com"
+GCP_PROJECT_ID="p-dev-gce-60pf"
+GCP_SA="dev-service-account@p-dev-gce-60pf.iam.gserviceaccount.com"
 GCP_REGION="northamerica-south1"
 ARTIFACT_REGISTRY_NAME="ai-hub-sharepoint"
 NEWS_EXTRACTION_PIPELINE_IMAGE_NAME="$(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/$(ARTIFACT_REGISTRY_NAME)/news_extraction_pipeline:latest"
