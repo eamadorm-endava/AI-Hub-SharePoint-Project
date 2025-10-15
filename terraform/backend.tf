@@ -3,7 +3,7 @@
 # is lost when the container is turned off. So the tf.state needs to exists in gcs
 terraform {
   backend "gcs" {
-    bucket = "eamadorm-tf-bucket-personal"
+    bucket = "eamadorm-tf-bucket"
     prefix = "terraform/state"
   }
 }
