@@ -33,6 +33,9 @@ dev = [
     "pydantic-settings>=2.11.0",
     "uvicorn>=0.37.0",
 ]
+gemini = [
+    "google-genai>=1.45.0",
+]
 notebooks = [
     "dotenv>=0.9.9",
     "ipykernel>=6.30.1",
