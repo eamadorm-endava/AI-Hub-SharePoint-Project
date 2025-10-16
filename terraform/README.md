@@ -45,7 +45,7 @@ You only need to manually create one resource: the GCS bucket to hold the state 
 
         terraform {
                 backend "gcs" {
-                        bucket = "eamadorm-tf-bucket"
+                        bucket = "<name-of-bucket-manually-created>"
                         prefix = "terraform/state"
                 }
         }
