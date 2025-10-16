@@ -1,75 +1,56 @@
-# Terraform in Azure
+# Terraform in GCP
 
-## [Authenticate Terraform to Azure](https://learn.microsoft.com/en-us/azure/developer/terraform/authenticate-to-azure?tabs=bash)
+## [Authenticate Terraform to GCP](https://cloud.google.com/docs/terraform/authentication)
 
-First of all, you need an Azure subscription.
+First, you need a GCP Project. Terraform can authenticate to GCP in a few ways, but the most common is trough Application Default Credentials (ADC), which is a strategy used by the authentication libraries to automatically find credentials based on the application environment.
 
-Terraform only supports authenticating to Azure with the Azure CLI. Authenticating using Azure Powershell isn't supported.
+When using ADC, Terraform can run in either a development or production environment without changing how it authenticates to Google Cloud services and APIs.
 
+### Authenticate using a user account
 
-## Create an Azure Resource Group
+In the terminal, make sure you have the gcloud CLI, and run:
 
-1.- Create a file named providers.tf, and insert the code that is shown [here](https://learn.microsoft.com/en-us/azure/developer/terraform/create-resource-group?tabs=azure-cli#implement-the-terraform-code).
+        gcloud auth application-default login
 
-2.- Create a file called main.tf, where you will create a ***resource group***.
+this will create ADCs with your user account, if you want to impersonate a service account, use:
 
-A **resource group** is a container that logically organizes related resources for an Azure solution. These resources can be anything from VM and storage accounts, to databases and web apps. 
-
-Essentially, it's a way to group resources that are related to a specific application or project, making them easier to manage, deploy, update, and delete as a single unit.
-
-Basically, its the same as a project in Google Cloud.
-
-## Creation of an Storage Blob Container
-
-To do so, you first need a resource_group, then, you need to create a ***storage account***.
-
-An **Storage Account** contains all of your Azure Storage data objects: blobs, files, queues, and tables. The storage account provides an unique namespace for your Azure Storage data that's accessible from anywhere in the world over HTTP or HTTPS. Data in your storage account is durable and highly available, secure, and massively scalable.
-
-There are different storage accounts, see this [link](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview#types-of-storage-accounts) for more info.
-
-***The name of the storage account must be unique within Azure. No two storage accounts can have the same name.**
-
-## Store the tf.state remotely
-
-When working with CI/CD pipelines, you need a place to persist the tf.state. To do so, you first need to **manually create the following resources:**
-
-1. **Resource Group:** You can use the Azure CLI:
-
-        az group create --name resourcegroupname --location nameoflocation
-
-2. **Storage Account:** Using the CLI:
-
-        az storage account create \
-        --name storageaccountname \
-        --resource-group resourcegroupname \
-        --location locationname \
-        --sku Standard_LRS \
-        --kind StorageV2 \
-        --enable-hierarchical-namespace true
-
-3. **Storage Container:** Using the CLI:
-
-        az storage container create \
-        --name storagecontainername \
-        --account-name storageaccountname \
-        --auth-mode login
+        gcloud auth application-default login --impersonate-service-account <your-service-account-email>
 
 
-After manually creating those resources, create a ***backend.tf*** file (No variables are allowed here):
+**When using Terraform with GCP services such as Compute Engine, App Engine, and CloudRun functions, you can attach a user-managed service account to resources**
 
+## Create a [main.tf](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started) file
 
-    terraform {
-        backend "azurerm" {
-            resource_group_name  = "resourcegroupname"
-            storage_account_name  = "storageaccountname"
-            container_name        = "storagecontainername"
-            key                   = "terraform.tfstate"
+In this file, include the following configuration:
+
+        provider "google" {
+                project = "<your-project-id>"
+                region  = "<where-resources-will-be-created>"
+                zone    = "<where-resources-will-be-created>"
         }
-    }
 
-Then, you can normally set
+Then, you can normally start adding resources in this file
+
+## Store the terraform.tfstate remotely
+
+For teamwork or CI/CD pipelines, you need to store the terraform.tfstate file remotely so its state can be shared and persisted. In GCP, you use a GCS bucket for this.
+
+You only need to manually create one resource: the GCS bucket to hold the state file.
+
+1. Create the GCS Bucket using the CLI (gsutil): You must create this bucket before running Terraform.
+
+        gcloud storage create bucket <bucket-name> --location <location>
+
+2. Create a backend.tf file (No variables are allowed in this file) with the following data:
+
+        terraform {
+                backend "gcs" {
+                        bucket = "eamadorm-tf-bucket"
+                        prefix = "terraform/state"
+                }
+        }
+
+3. Now, you can initialize Terraform and apply your configuration. Terraform will automatically detect the backend configuration and store the state file in your GCS bucket.
 
         terraform init
         terraform apply
-
-To start saving the tf.state in the storage container in Azure
