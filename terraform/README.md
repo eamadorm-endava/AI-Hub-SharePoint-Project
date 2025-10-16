@@ -19,6 +19,18 @@ this will create ADCs with your user account, if you want to impersonate a servi
 
 **When using Terraform with GCP services such as Compute Engine, App Engine, and CloudRun functions, you can attach a user-managed service account to resources**
 
+## Create a [main.tf](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started) file
+
+In this file, include the following configuration:
+
+        provider "google" {
+                project = "<your-project-id>"
+                region  = "<where-resources-will-be-created>"
+                zone    = "<where-resources-will-be-created>"
+        }
+
+Then, you can normally start adding resources in this file
+
 ## Store the terraform.tfstate remotely
 
 For teamwork or CI/CD pipelines, you need to store the terraform.tfstate file remotely so its state can be shared and persisted. In GCP, you use a GCS bucket for this.
