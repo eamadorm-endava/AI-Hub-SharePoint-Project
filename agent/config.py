@@ -81,6 +81,15 @@ class AgentConfig(BaseSettings, validate_assignment=True):
             description="Name of the Gemini model to use.",
         ),
     ]
+    MODEL_TEMPERATURE: Annotated[
+        float,
+        Field(
+            default=0.5,
+            description="Controls randomness in model output: lower values make responses more focused, higher values more creative.",
+            ge=0,
+            le=1,
+        ),
+    ]
 
     def __init__(self):
         super().__init__()
