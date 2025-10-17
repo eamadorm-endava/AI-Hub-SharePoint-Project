@@ -8,7 +8,8 @@ dependencies = []
 
 [dependency-groups]
 ai-agent = [
-    "openai>=2.0.0",
+    "google-genai>=1.45.0",
+    "pydantic-ai>=1.1.0",
 ]
 ai-news-automation = [
     "bs4>=0.0.2",
