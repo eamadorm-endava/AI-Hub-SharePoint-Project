@@ -1,56 +1,7 @@
 from pydantic_settings import BaseSettings
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, PrivateAttr
 from typing import Annotated
 from utils.gcp.secret_manager import get_secret
-
-
-class AgentConfig(BaseSettings, validate_assignment=True):
-    """
-    Class that holds configuration values for the agent, it requires to assign
-    parameters after initialization.
-    """
-
-    __GEMINI_API_KEY: Annotated[
-        SecretStr,
-        Field(
-            default="dummy_key",
-            description="Gemini API key.",
-            min_length=1,
-        ),
-    ]
-    GEMINI_MODEL_NAME: Annotated[
-        str,
-        Field(
-            default="gemini-1.5-pro",
-            description="Name of the Gemini model to use.",
-        ),
-    ]
-
-    def __init__(self):
-        super().__init__()
-        self.__load_gemini_api_key()
-
-    def __load_gemini_api_key(self) -> None:
-        """
-        Get secrets from the secret manager.
-        """
-        gcp_config = GCPConfig()
-        self.__GEMINI_API_KEY = get_secret(
-            secret_id=gcp_config.GEMINI_API_KEY_NAME,
-            version_id=gcp_config.GEMINI_API_KEY_VERSION,
-            project_id=gcp_config.PROJECT_ID,
-        )
-
-    # Creating a read-only property for GEMINI_API_KEY
-    @property
-    def GEMINI_API_KEY(self) -> SecretStr:
-        return self.__GEMINI_API_KEY
-
-    # To force to read .env file
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra = "allow"
 
 
 class GCPConfig(BaseSettings, validate_assignment=True):
@@ -87,6 +38,63 @@ class GCPConfig(BaseSettings, validate_assignment=True):
             description="Version of the secret in Secret Manager that contains the Gemini API key.",
         ),
     ]
+
+    def get_secret(self, secret_id: str, version_id: int) -> SecretStr:
+        """
+        Get secrets from the secret manager.
+
+        Args:
+            secret_id (str): The ID of the secret to retrieve.
+            version_id (int): The version of the secret to retrieve.
+
+        Returns:
+            SecretStr: The secret value.
+        """
+        return get_secret(
+            secret_id=secret_id,
+            version_id=version_id,
+            project_id=self.PROJECT_ID,
+        )
+
+    # To force to read .env file
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        extra = "allow"
+
+
+class AgentConfig(BaseSettings, validate_assignment=True):
+    """
+    Class that holds configuration values for the agent, it requires to assign
+    parameters after initialization.
+    """
+
+    # Private attributes cannot be added in Annotated
+    _CLOUD_PROVIDER: GCPConfig = PrivateAttr(default=GCPConfig())
+    _GEMINI_API_KEY: SecretStr = PrivateAttr(default=SecretStr("dummy-api-key"))
+
+    # Public attributes
+    GEMINI_MODEL_NAME: Annotated[
+        str,
+        Field(
+            default="gemini-1.5-pro",
+            description="Name of the Gemini model to use.",
+        ),
+    ]
+
+    def __init__(self):
+        super().__init__()
+
+    def load_gemini_api_key(self):
+        self._GEMINI_API_KEY = self._CLOUD_PROVIDER.get_secret(
+            secret_id=self._CLOUD_PROVIDER.GEMINI_API_KEY_NAME,
+            version_id=self._CLOUD_PROVIDER.GEMINI_API_KEY_VERSION,
+        )
+
+    # Creating a read-only property for GEMINI_API_KEY
+    @property
+    def GEMINI_API_KEY(self) -> SecretStr:
+        return self._GEMINI_API_KEY
 
     # To force to read .env file
     class Config:
