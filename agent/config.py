@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field, SecretStr
 from typing import Annotated
-from utils.azure.key_vaults import get_secret
+from utils.gcp.secret_manager import get_secret
 
 
 class AgentConfig(BaseSettings, validate_assignment=True):
@@ -10,84 +10,86 @@ class AgentConfig(BaseSettings, validate_assignment=True):
     parameters after initialization.
     """
 
-    PROMPT_TEMPLATE_PATH: Annotated[
-        str,
-        Field(default="prompts/page_generator.txt"),
-    ]
-    OPENAI_KEY: Annotated[
+    __GEMINI_API_KEY: Annotated[
         SecretStr,
         Field(
             default="dummy_key",
-            description="OpenAI API key.",
+            description="Gemini API key.",
             min_length=1,
         ),
     ]
+    GEMINI_MODEL_NAME: Annotated[
+        str,
+        Field(
+            default="gemini-1.5-pro",
+            description="Name of the Gemini model to use.",
+        ),
+    ]
 
-    def load_secrets(self) -> None:
+    def __init__(self):
+        super().__init__()
+        self.__load_gemini_api_key()
+
+    def __load_gemini_api_key(self) -> None:
         """
-        Get secrets from key-vault.
+        Get secrets from the secret manager.
         """
-        azure_config = AzureConfig()
-        secret_name = azure_config.OPENAI_SECRET_NAME
-        vault_url = azure_config.KEY_VAULT_URL
-        secret_value = get_secret(vault_url, secret_name)
-        self.OPENAI_KEY = secret_value
+        gcp_config = GCPConfig()
+        self.__GEMINI_API_KEY = get_secret(
+            secret_id=gcp_config.GEMINI_API_KEY_NAME,
+            version_id=gcp_config.GEMINI_API_KEY_VERSION,
+            project_id=gcp_config.PROJECT_ID,
+        )
+
+    # Creating a read-only property for GEMINI_API_KEY
+    @property
+    def GEMINI_API_KEY(self) -> SecretStr:
+        return self.__GEMINI_API_KEY
+
+    # To force to read .env file
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        extra = "allow"
 
 
-class AzureConfig(BaseSettings, validate_assignment=True):
+class GCPConfig(BaseSettings, validate_assignment=True):
     """
-    Class that holds configuration values for Azure services. Allowing to, in any future, change the
+    Class that holds configuration values for GCP services. Allowing to, in any future, change the
     cloud provider or the way to access the secrets.
     """
 
-    KEY_VAULT_URL: Annotated[
+    PROJECT_ID: Annotated[
         str,
         Field(
-            default="https://dummy-key-vault.vault.azure.net/",
-            description="URL to a key-vault on Azure",
-            pattern="^https://[A-Za-z-]+.vault.azure.net/",
+            default="dummy-gcp-project-id",
+            description="GCP Project ID",
         ),
     ]
-    AIHUB_APP_CLIENT_ID: Annotated[
+    REGION: Annotated[
         str,
         Field(
-            default="dummy-app-client-id",
-            description="Client ID of the AI-Hub application registered in Microsoft Entra",
+            default="dummy-gcp-region",
+            description="GCP Region where most of the services will be deployed",
         ),
     ]
-    AIHUB_APP_TENANT_ID: Annotated[
+    GEMINI_API_KEY_NAME: Annotated[
         str,
         Field(
-            default="dummy-app-tenant-id",
-            description="Client ID of the AI-Hub application registered in Microsoft Entra",
+            default="dummy-gemini-secret-name",
+            description="Name of the secret in Secret Manager that contains the Gemini API key.",
         ),
     ]
-    AIHUB_APP_CLIENT_SECRET_NAME: Annotated[
-        str,
+    GEMINI_API_KEY_VERSION: Annotated[
+        int,
         Field(
-            default="dummy-app-client-secret-name",
-            description="Name of the secret in Key Vault that contains the client secret for Microsoft Graph API.",
-        ),
-    ]
-    AIHUB_APP_CLIENT_SECRET_VALUE: Annotated[
-        SecretStr,
-        Field(
-            default="dummy-app-client-secret-value",
-            description="Client secret for the AI-Hub application registered in Microsoft Entra",
-        ),
-    ]
-    OPENAI_SECRET_NAME: Annotated[
-        str,
-        Field(
-            default="dummy-openai-secret-name",
-            description="Name of the secret in Key Vault that contains the OpenAI API key.",
+            default=1,
+            description="Version of the secret in Secret Manager that contains the Gemini API key.",
         ),
     ]
 
-    def load_secrets(self) -> None:
-        """
-        Get Azure secrets from key-vault.
-        """
-        self.AIHUB_APP_CLIENT_SECRET_VALUE = get_secret(
-            vault_url=self.KEY_VAULT_URL, secret_name=self.AIHUB_APP_CLIENT_SECRET_NAME
-        )
+    # To force to read .env file
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        extra = "allow"
