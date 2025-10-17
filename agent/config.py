@@ -77,7 +77,7 @@ class AgentConfig(BaseSettings, validate_assignment=True):
     GEMINI_MODEL_NAME: Annotated[
         str,
         Field(
-            default="gemini-1.5-pro",
+            default="gemini-2.5-pro",
             description="Name of the Gemini model to use.",
         ),
     ]
