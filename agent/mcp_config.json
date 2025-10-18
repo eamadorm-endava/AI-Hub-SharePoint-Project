@@ -4,11 +4,16 @@
             "command": "uvx",
             "args": ["mcp-server-fetch"]
         },
-        "airbnb": {
+        "git": {
+            "command": "uvx",
+            "args": ["mcp-server-git", "--repository", "/workspaces/AI-Hub-SharePoint-Agent"]
+        },
+        "filesystem": {
             "command": "npx",
             "args": [
                 "-y",
-                "@openbnb/mcp-server-airbnb"
+                "@modelcontextprotocol/server-filesystem",
+                "/workspaces/AI-Hub-SharePoint-Agent"
             ]
         }
     }
