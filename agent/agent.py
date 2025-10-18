@@ -1,6 +1,7 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.google import GoogleModel, GoogleModelSettings
 from pydantic_ai.providers.google import GoogleProvider
+from pydantic_ai.mcp import load_mcp_servers
 from loguru import logger
 import sys
 
@@ -18,7 +19,9 @@ provider = GoogleProvider(api_key=agent_config.GEMINI_API_KEY.get_secret_value()
 model = GoogleModel(model_name=agent_config.GEMINI_MODEL_NAME, provider=provider)
 model_settings = GoogleModelSettings(temperature=agent_config.MODEL_TEMPERATURE)
 
-agent = Agent(model=model, model_settings=model_settings)
+servers = load_mcp_servers("agent/mcp_config.json")
+
+agent = Agent(model=model, model_settings=model_settings, toolsets=servers)
 
 
 # This will execute the agent on the local console
