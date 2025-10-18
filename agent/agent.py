@@ -33,6 +33,6 @@ if __name__ == "__main__":
         result = agent.run_sync(request, message_history=history)
         history = result.all_messages()  # list of ModelRequest objects
         history_json = result.all_messages_json()
-        logger.debug(f"{history_json=}")
+        # logger.debug(f"{history_json=}")
         logger.info(f"{result.output}")
         request = input("Introduce a query (To exit, enter 'exit'):").strip()
