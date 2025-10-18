@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field, SecretStr, PrivateAttr
 from typing import Annotated
+from loguru import logger
 from utils.gcp.secret_manager import get_secret
 
 
@@ -93,12 +94,16 @@ class AgentConfig(BaseSettings, validate_assignment=True):
 
     def __init__(self):
         super().__init__()
+        self.load_gemini_api_key()
 
     def load_gemini_api_key(self):
-        self._GEMINI_API_KEY = self._CLOUD_PROVIDER.get_secret(
-            secret_id=self._CLOUD_PROVIDER.GEMINI_API_KEY_NAME,
-            version_id=self._CLOUD_PROVIDER.GEMINI_API_KEY_VERSION,
-        )
+        try:
+            self._GEMINI_API_KEY = self._CLOUD_PROVIDER.get_secret(
+                secret_id=self._CLOUD_PROVIDER.GEMINI_API_KEY_NAME,
+                version_id=self._CLOUD_PROVIDER.GEMINI_API_KEY_VERSION,
+            )
+        except Exception as e:
+            logger.error(f"Error loading Gemini API key: {e}")
 
     # Creating a read-only property for GEMINI_API_KEY
     @property
