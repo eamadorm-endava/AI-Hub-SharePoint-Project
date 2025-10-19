@@ -7,6 +7,7 @@ NEWS_EXTRACTION_PIPELINE_IMAGE_NAME="$(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_
 gcloud-auth:
 	gcloud config unset auth/impersonate_service_account 
 	gcloud auth application-default login
+	gcloud auth application-default set-quota-project $(GCP_PROJECT_ID)
 
 uv-sync:
 	uv sync --all-groups
