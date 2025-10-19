@@ -23,6 +23,24 @@ variable "gcp_zone" {
   default     = "northamerica-south1-a"
 }
 
+variable "main_bucket_name" {
+  type        = string
+  description = "Name of the main GCS bucket to store blobs"
+  default     = "ai-hub-sharepoint"
+}
+
+variable "main_bucket_storage_class" {
+  type        = string
+  description = "Storage class of the main GCS bucket"
+  default     = "STANDARD"
+}
+
+variable "main_bucket_autoclass_enabled" {
+  type        = bool
+  description = "Determines if Autoclass is enabled for the main GCS bucket"
+  default     = true
+}
+
 variable "artifact_registry_name" {
   type        = string
   description = "Name of the artifact registry to create"

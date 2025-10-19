@@ -30,6 +30,19 @@ resource "google_artifact_registry_repository" "ai-hub-sharepoint" {
   }
 }
 
+
+# ################# Bucket to store blobs ###################
+resource "google_storage_bucket" "static" {
+  name     = var.main_bucket_name
+  location = var.gcp_region
+  #  storage_class = var.main_bucket_storage_class
+  autoclass {
+    enabled = var.main_bucket_autoclass_enabled
+  }
+  uniform_bucket_level_access = true # Enforce uniform access control, no ACLs
+}
+
+
 # ################# CloudRun - News Extraction Pipeline API ###################
 
 resource "google_cloud_run_v2_service" "news_extraction_pipeline" {
