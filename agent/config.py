@@ -39,6 +39,13 @@ class GCPConfig(BaseSettings, validate_assignment=True):
             description="Version of the secret in Secret Manager that contains the Gemini API key.",
         ),
     ]
+    BUCKET_NAME: Annotated[
+        str,
+        Field(
+            default="dummy-gcp-bucket-name",
+            description="GCP Bucket name for storing agent related data.",
+        ),
+    ]
 
     def get_secret(self, secret_id: str, version_id: int) -> SecretStr:
         """
