@@ -152,67 +152,36 @@ def upload_file(
     )
 
 
-def upload_image_from_memory(
-    blob_name: str,
-    image: BytesIO,
-    bucket_name: str,
+def upload_bytes(
+    blob_name: str, bucket_name: str, content_type: str, bytes_data: BytesIO
 ) -> None:
     """
-    Upload an image to a GCS bucket
+    Upload bytes data to a GCS bucket.
 
     Args:
-        blob_name: str -> Path + name of the file to be stored. ex: "my_folder/my_image.png"
-        image: BytesIO -> Image to be stored in GCS.
+        blob_name: str -> Path + name of the file to be stored. ex: "my_folder/my_file.bin"
         bucket_name: str -> Name of the GCS bucket. ex: "my_bucket"
-
+        bytes_data: BytesIO -> Data to be stored in GCS.
     Return:
         None
     """
     if not bucket_exists(bucket_name):
         raise ValueError(f"The bucket {bucket_name} does not exists")
-    if not isinstance(image, BytesIO):
-        raise TypeError("The image parameter must be a BytesIO object")
-
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    blob.upload_from_file(image)
-
-    blob.make_public()
-
-    logger.info("Image successfully stored in GCS bucket")
-
-    return blob.public_url
-
-
-def upload_file_from_memory(
-    blob_name: str,
-    string_data: str,
-    bucket_name: str,
-) -> None:
-    """
-    Uploading from memory is useful for when you want to avoid unnecessary writes from memory
-    to your local file system.
-
-    Args:
-        blob_name: str -> Path + name of the file to be stored. ex: "my_folder/my_file.txt"
-        string_data: str -> Data to be stored in GCS. Must be converted to string
-        bucket_name: str -> Name of the GCS bucket. ex: "my_bucket"
-
-    Return:
-        None
-    """
-    if not bucket_exists(bucket_name):
-        raise ValueError(f"The bucket {bucket_name} does not exists")
-    if not isinstance(string_data, str) or not isinstance(blob_name, str):
+    if not isinstance(bytes_data, BytesIO):
+        raise TypeError("The bytes_data parameter must be a BytesIO object")
+    if not all(
+        isinstance(param, str) and param.strip() != ""
+        for param in [blob_name, content_type]
+    ):
         raise ValueError(
-            "The parameters string_data and blob_name must be string types"
+            "blob_name and content_type parameters must be non-empty strings"
         )
 
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
-    blob.upload_from_string(string_data)
+    blob.upload_from_file(bytes_data, content_type=content_type)
 
-    logger.info("In-memory data successfully stored in GCS bucket")
+    logger.info("Bytes data successfully stored in GCS bucket")
 
 
 def delete_file(file_name: str, bucket_name: str) -> None:
