@@ -8,6 +8,8 @@ gcloud-auth:
 	gcloud config unset auth/impersonate_service_account 
 	gcloud auth application-default login
 	gcloud auth application-default set-quota-project $(GCP_PROJECT_ID)
+	gcloud config set project $(GCP_PROJECT_ID)
+	export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/.config/gcloud/application_default_credentials.json
 
 uv-sync:
 	uv sync --all-groups
