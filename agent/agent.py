@@ -8,7 +8,7 @@ import sys
 sys.path.append("..")
 
 from agent.config import AgentConfig
-from agent.tools.gcs_tools import (
+from agent.tools.cloud_storage import (
     load_file_from_gcs,
     list_files_in_gcs_bucket,
     upload_text_to_gcs,
