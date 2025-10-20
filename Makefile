@@ -6,14 +6,20 @@ NEWS_EXTRACTION_PIPELINE_IMAGE_NAME="$(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_
 
 gcloud-auth:
 	gcloud config unset auth/impersonate_service_account 
-	gcloud auth application-default login --impersonate-service-account $(GCP_SA)
-	
+	gcloud auth application-default login
+	gcloud auth application-default set-quota-project $(GCP_PROJECT_ID)
+	gcloud config set project $(GCP_PROJECT_ID)
+	export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/.config/gcloud/application_default_credentials.json
+
 uv-sync:
 	uv sync --all-groups
 
 install-git-hooks: 
 	uv run pre-commit install
 	uv run pre-commit install-hooks
+
+run-agent:
+	uv run python -m agent.agent
 
 run-local-news-extraction-pipeline-endpoint:
 	uv run uvicorn news_extraction_pipeline.app.main:app --reload
