@@ -104,7 +104,7 @@ class TTSToolConfig(GCPToolConfig):
         return "text_to_speech"
 
 
-class ImaGenToolConfig(BaseSettings, validate_assignment=True):
+class ImaGenToolConfig(GCPToolConfig, validate_assignment=True):
     """
     Configuration class for Image Generation tool.
     Inherits API key loading logic from GCPToolConfig.
