@@ -133,6 +133,7 @@ def text_to_speech(
     text: str,
     mode: str,
     gcs_path: str = tts_config.GCS_PATH,
+    make_public: bool = True,
 ) -> str | None:
     """
     Orchestrator function that generates the single speaker audio and stores it into GCS
@@ -140,8 +141,10 @@ def text_to_speech(
     Args:
         title: str -> Title of the audio generated. (e.g. my_audio)
         text: str -> The text to be converted into speech.
-        gcs_path: str -> Path where the audio will be stored in gcs. (e.g. audio/)
         mode: str -> Either 'single' or 'multi' speakers
+        gcs_path: str -> Path where the audio will be stored in gcs. (e.g. audio/)
+        make_public: bool -> True if the blob will be public, otherwise False
+
 
     Returns:
         gcs_audio_path: Path where the audio was stored
@@ -189,12 +192,17 @@ def text_to_speech(
     logger.debug("Audio successfully created")
 
     logger.debug("Storing audio bytes into GCS")
-    upload_bytes(
+    blob_public_url = upload_bytes(
         bytes_data=audio_bytes,
         blob_name=full_gcs_path,
         content_type="audio/wav",
         bucket_name=tts_config._CLOUD_PROVIDER.BUCKET_NAME,
+        make_public=make_public,
     )
+
+    if blob_public_url:
+        logger.info(f"Blob can be access through: {blob_public_url}")
+        return blob_public_url
 
     gcs_audio_path = f"gs://{tts_config._CLOUD_PROVIDER.BUCKET_NAME}/{full_gcs_path}"
     logger.info(f"Audio stored in {gcs_audio_path}")
