@@ -1,9 +1,28 @@
 from loguru import logger
-from utils.gcp.gcs import get_file, list_blobs
+from utils.gcp.gcs import get_file, list_blobs, upload_bytes
 from agent.tools.config import TTSToolConfig
 
 
 tts_config = TTSToolConfig()
+
+
+def upload_text_to_gcs(text: str, blob_name: str) -> None:
+    """
+    Wrapper function to upload text files into GCS
+
+    Args:
+        text: str -> Text to be stored in GCS
+        blob_name: str -> Name of the blob (e.g. gcs_path/file_name.txt)
+
+    Returns:
+        None
+    """
+    upload_bytes(
+        bytes_data=text.encode("UTF-8"),
+        blob_name=blob_name,
+        bucket_name=tts_config._CLOUD_PROVIDER.BUCKET_NAME,
+        content_type="text/plain",
+    )
 
 
 def load_file_from_gcs(blob_name: str) -> bytes:
