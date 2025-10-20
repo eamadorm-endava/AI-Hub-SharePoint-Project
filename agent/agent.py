@@ -14,9 +14,12 @@ from agent.tools.gcs_tools import (
     upload_text_to_gcs,
 )
 from agent.tools.text_to_speech import text_to_speech
+from agent.auxiliars import load_system_prompt
 
 
 agent_config = AgentConfig()
+
+system_prompt = load_system_prompt()
 
 # To load the Gemini API key from GCP Secret Manager
 agent_config.load_gemini_api_key()
@@ -30,6 +33,7 @@ servers = load_mcp_servers("agent/mcp_config.json")
 agent = Agent(
     model=model,
     model_settings=model_settings,
+    system_prompt=system_prompt,
     toolsets=servers,
     tools=[
         Tool(upload_text_to_gcs),

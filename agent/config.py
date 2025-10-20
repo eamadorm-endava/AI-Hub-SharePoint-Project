@@ -46,6 +46,13 @@ class GCPConfig(BaseSettings, validate_assignment=True):
             description="GCP Bucket name for storing agent related data.",
         ),
     ]
+    SYSTEM_PROMPT_PATH: Annotated[
+        str,
+        Field(
+            default="system_prompts/system_prompt_first_proposal.txt",
+            description="GCS path to the system prompt file.",
+        ),
+    ]
 
     def get_secret(self, secret_id: str, version_id: int) -> SecretStr:
         """
