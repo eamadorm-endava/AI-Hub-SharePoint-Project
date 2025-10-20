@@ -1,4 +1,4 @@
-from pydantic_ai import Agent
+from pydantic_ai import Agent, Tool
 from pydantic_ai.models.google import GoogleModel, GoogleModelSettings
 from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.mcp import load_mcp_servers
@@ -8,6 +8,15 @@ import sys
 sys.path.append("..")
 
 from agent.config import AgentConfig
+from agent.tools.gcs_tools import (
+    upload_bytes_to_gcs,
+    load_file_from_gcs,
+    list_files_in_gcs_bucket,
+)
+from agent.tools.text_to_speech import (
+    generate_single_speaker_tts_audio,
+    generate_multi_speaker_tts_audio,
+)
 
 
 agent_config = AgentConfig()
@@ -21,7 +30,18 @@ model_settings = GoogleModelSettings(temperature=agent_config.MODEL_TEMPERATURE)
 
 servers = load_mcp_servers("agent/mcp_config.json")
 
-agent = Agent(model=model, model_settings=model_settings, toolsets=servers)
+agent = Agent(
+    model=model,
+    model_settings=model_settings,
+    toolsets=servers,
+    tools=[
+        Tool(upload_bytes_to_gcs),
+        Tool(generate_single_speaker_tts_audio),
+        Tool(generate_multi_speaker_tts_audio),
+        Tool(load_file_from_gcs),
+        Tool(list_files_in_gcs_bucket),
+    ],
+)
 
 
 # This will execute the agent on the local console

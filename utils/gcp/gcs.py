@@ -153,7 +153,7 @@ def upload_file(
 
 
 def upload_bytes(
-    blob_name: str, bucket_name: str, content_type: str, bytes_data: BytesIO
+    blob_name: str, bucket_name: str, content_type: str, bytes_data: bytes
 ) -> None:
     """
     Upload bytes data to a GCS bucket.
@@ -161,14 +161,14 @@ def upload_bytes(
     Args:
         blob_name: str -> Path + name of the file to be stored. ex: "my_folder/my_file.bin"
         bucket_name: str -> Name of the GCS bucket. ex: "my_bucket"
-        bytes_data: BytesIO -> Data to be stored in GCS.
+        bytes_data: bytes -> Raw binary data to be stored in GCS.
     Return:
         None
     """
     if not bucket_exists(bucket_name):
         raise ValueError(f"The bucket {bucket_name} does not exists")
-    if not isinstance(bytes_data, BytesIO):
-        raise TypeError("The bytes_data parameter must be a BytesIO object")
+    if not isinstance(bytes_data, bytes):
+        raise TypeError("The bytes_data parameter must be of type 'bytes'")
     if not all(
         isinstance(param, str) and param.strip() != ""
         for param in [blob_name, content_type]
@@ -179,7 +179,7 @@ def upload_bytes(
 
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
-    blob.upload_from_file(bytes_data, content_type=content_type)
+    blob.upload_from_file(BytesIO(bytes_data), content_type=content_type)
 
     logger.info("Bytes data successfully stored in GCS bucket")
 
@@ -264,3 +264,24 @@ def get_file(
     memory_blob = blob.download_as_bytes()
 
     return memory_blob
+
+
+def list_blobs(bucket_name: str) -> list[str]:
+    """
+    List all the blobs inside a GCS bucket.
+
+    Args:
+        bucket_name: str -> Name of the GCS bucket.
+
+    Returns:
+        list[str] -> List of blob names inside the bucket.
+    """
+    # bucket_exists already has error handlers
+    if not bucket_exists(bucket_name):
+        raise ValueError(f"The bucket {bucket_name} does not exists")
+
+    blobs = client.list_blobs(bucket_name)
+
+    blobs_name = [blob.name for blob in blobs]
+
+    return blobs_name

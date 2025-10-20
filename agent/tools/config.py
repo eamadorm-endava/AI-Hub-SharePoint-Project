@@ -51,6 +51,13 @@ class TTSToolConfig(BaseSettings, validate_assignment=True):
             description="Name of the second custom person for TTS.",
         ),
     ]
+    GCS_PATH: Annotated[
+        str,
+        Field(
+            default="audios/",
+            description="Path inside the GCS Bucket where the audio generated will be stored",
+        ),
+    ]
 
     def __init__(self):
         super().__init__()
