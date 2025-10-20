@@ -39,7 +39,7 @@ resource "google_storage_bucket" "static" {
   autoclass {
     enabled = var.main_bucket_autoclass_enabled
   }
-  uniform_bucket_level_access = true # Enforce uniform access control, no ACLs
+  uniform_bucket_level_access = false # Enforce uniform access control, no ACLs
 }
 
 
