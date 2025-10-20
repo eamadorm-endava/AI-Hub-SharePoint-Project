@@ -178,6 +178,7 @@ def text_to_speech(
     logger.debug(f"{title =}")
     logger.debug(f"{text =}")
     logger.debug(f"{gcs_path =}")
+    logger.debug(f"{mode =}")
     logger.debug(f"{full_gcs_path =}")
 
     logger.debug("Creating audio...")

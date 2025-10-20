@@ -9,14 +9,11 @@ sys.path.append("..")
 
 from agent.config import AgentConfig
 from agent.tools.gcs_tools import (
-    upload_bytes_to_gcs,
     load_file_from_gcs,
     list_files_in_gcs_bucket,
+    upload_text_to_gcs,
 )
-from agent.tools.text_to_speech import (
-    generate_single_speaker_tts_audio,
-    generate_multi_speaker_tts_audio,
-)
+from agent.tools.text_to_speech import text_to_speech
 
 
 agent_config = AgentConfig()
@@ -35,11 +32,10 @@ agent = Agent(
     model_settings=model_settings,
     toolsets=servers,
     tools=[
-        Tool(upload_bytes_to_gcs),
-        Tool(generate_single_speaker_tts_audio),
-        Tool(generate_multi_speaker_tts_audio),
+        Tool(upload_text_to_gcs),
         Tool(load_file_from_gcs),
         Tool(list_files_in_gcs_bucket),
+        Tool(text_to_speech),
     ],
 )
 
