@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Annotated
+from typing import Annotated, Optional
 
 
 class ImaGenRequest(BaseModel):
@@ -30,9 +30,12 @@ class Image(ImaGenRequest):
         ),
     ]
     image_bytes: Annotated[
-        bytes,
+        Optional[bytes],
         Field(
             default=None,
             description="Bytes of the image generated",
         ),
     ]
+
+    class Config:
+        validate_assignment = True
