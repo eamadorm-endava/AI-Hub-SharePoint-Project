@@ -30,7 +30,7 @@ class Image(ImaGenRequest):
         ),
     ]
     image_bytes: Annotated[
-        str,
+        bytes,
         Field(
             default=None,
             description="Bytes of the image generated",
