@@ -120,6 +120,6 @@ async def generate_images(image_requests: list[ImaGenRequest]) -> list[Image]:
         image_data.public_url = images_urls[image_index]
         image_data.image_bytes = None  # To not send all the image bytes to the AI Agent
 
-    logger.info("Images Successfully Generated")
+    logger.info("Images successfully generated")
 
     return images_data
