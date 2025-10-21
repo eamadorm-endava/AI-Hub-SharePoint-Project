@@ -101,12 +101,18 @@ resource "google_bigquery_table" "news_metadata" {
 
   labels = {
     env         = "default"
-    primary_key = "title"
+    primary_key = "news_id"
   }
 
   schema = <<EOF
 
 [
+  {
+    "name": "news_id",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "ID of the news"
+  },
   {
     "name": "title",
     "type": "STRING",
