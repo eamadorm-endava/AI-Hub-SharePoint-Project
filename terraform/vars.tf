@@ -76,3 +76,15 @@ variable "news_extraction_pipeline_image_tag" {
   description = "Tag of the docker image that contains the news extraction pipeline"
   default     = "latest"
 }
+
+variable "dataset_id" {
+  type        = string
+  description = "ID of the dataset that the AI agent will have access to"
+  default     = "ai_hub_sharepoint"
+}
+
+variable "news_metadata_table_id" {
+  type        = string
+  description = "ID of the table ai_news_metadata"
+  default     = "news_metadata"
+}
