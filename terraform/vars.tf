@@ -83,7 +83,7 @@ variable "dataset_id" {
   default     = "ai_hub_sharepoint"
 }
 
-variable "news_metadata_table_id" {
+variable "news_extraction_table_id" {
   type        = string
   description = "ID of the table ai_news_metadata"
   default     = "news_metadata"

@@ -93,9 +93,9 @@ resource "google_bigquery_dataset" "main_dataset" {
   }
 }
 
-resource "google_bigquery_table" "news_metadata" {
+resource "google_bigquery_table" "news_extraction" {
   dataset_id = google_bigquery_dataset.main_dataset.dataset_id
-  table_id   = var.news_metadata_table_id
+  table_id   = var.news_extraction_table_id
 
   deletion_protection = false
 
