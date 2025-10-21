@@ -39,6 +39,13 @@ class GCPConfig(BaseSettings, validate_assignment=True):
             description="Version of the secret in Secret Manager that contains the Gemini API key.",
         ),
     ]
+    DATASET_ID: Annotated[
+        str,
+        Field(
+            default="dummy-dataset-id",
+            description="BigQuery Dataset ID",
+        ),
+    ]
     BUCKET_NAME: Annotated[
         str,
         Field(
