@@ -117,7 +117,8 @@ async def generate_images(image_requests: list[ImaGenRequest]) -> list[Image]:
     images_urls = await asyncio.gather(*storage_tasks, return_exceptions=True)
 
     for image_index, image_data in enumerate(images_data):
-        image_data.url = images_urls[image_index]
+        image_data.public_url = images_urls[image_index]
+        image_data.image_bytes = None  # To not send all the image bytes to the AI Agent
 
     logger.info("Images Successfully Generated")
 
