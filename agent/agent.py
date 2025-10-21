@@ -14,6 +14,7 @@ from agent.tools.cloud_storage import (
     upload_text_to_gcs,
 )
 from agent.tools.text_to_speech import text_to_speech
+from agent.tools.image_generation import generate_images
 from agent.auxiliars import load_system_prompt
 
 
@@ -40,6 +41,7 @@ agent = Agent(
         Tool(load_file_from_gcs),
         Tool(list_files_in_gcs_bucket),
         Tool(text_to_speech),
+        Tool(generate_images),
     ],
 )
 

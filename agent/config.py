@@ -49,7 +49,7 @@ class GCPConfig(BaseSettings, validate_assignment=True):
     SYSTEM_PROMPT_PATH: Annotated[
         str,
         Field(
-            default="system_prompts/system_prompt_third_proposal.txt",
+            default="system_prompts/system_prompt_fourth_proposal.txt",
             description="GCS path to the system prompt file.",
         ),
     ]
