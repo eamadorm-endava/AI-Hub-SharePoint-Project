@@ -113,7 +113,7 @@ class ImaGenToolConfig(GCPToolConfig, validate_assignment=True):
     MODEL_NAME: Annotated[
         str,
         Field(
-            default="gemini-2.5-flash-image",
+            default="imagen-4.0-generate-001",
             description="Name of the model that will generate the images",
         ),
     ]
@@ -140,6 +140,13 @@ class ImaGenToolConfig(GCPToolConfig, validate_assignment=True):
             description="Number of images to generate each time the tool is executed",
             gt=0,
             lt=5,
+        ),
+    ]
+    CONTENT_TYPE: Annotated[
+        str,
+        Field(
+            default="image/png",
+            description="Type of data that is stored in GCP",
         ),
     ]
 
