@@ -66,6 +66,22 @@ resource "google_cloud_run_v2_service" "news_extraction_pipeline" {
           cpu    = "1"
         }
       }
+      env {
+        name  = "PROJECT_ID"
+        value = var.gcp_project_id
+      }
+      env {
+        name  = "BQ_DATASET_ID"
+        value = var.dataset_id
+      }
+      env {
+        name  = "NEWS_EXTRACTION_TABLE_ID"
+        value = var.news_extraction_table_id
+      }
+      env {
+        name  = "NEWS_EXTRACTION_TABLE_PK"
+        value = var.news_extraction_table_pk
+      }
     }
     scaling {
       # Min instances

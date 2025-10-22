@@ -88,3 +88,9 @@ variable "news_extraction_table_id" {
   description = "ID of the table ai_news_metadata"
   default     = "news_metadata"
 }
+
+variable "news_extraction_table_pk" {
+  type        = string
+  description = "Name of the column that acts as the PK"
+  default     = "news_id"
+}
