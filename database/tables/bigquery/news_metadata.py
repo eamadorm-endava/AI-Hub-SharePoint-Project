@@ -118,9 +118,11 @@ class NewsExtractionTable(BigQueryTable):
                 }
             ).model_dump()  # To convert NewsMetadata in a Python dictionary
             for news_metadata in list_news_metadata
+            # Due to this condition is evaluated before the news_id is created in the NewsMetadata instance
+            # it is required to generate the id instead of calling news_metadata.news_id (at that moment is always None)
             if not self._id_in_table(
                 primary_key_column_name=self.primary_key,
-                primary_key_row_value=news_metadata.news_id,
+                primary_key_row_value=self._generate_id(news_metadata.news_link),
                 table_name=self.name,
             )
         ]
