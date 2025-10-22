@@ -1,7 +1,7 @@
-GCP_PROJECT_ID="p-dev-gce-60pf"
+GCP_PROJECT_ID=p-dev-gce-60pf
 GCP_SA="dev-service-account@p-dev-gce-60pf.iam.gserviceaccount.com"
-GCP_REGION="northamerica-south1"
-ARTIFACT_REGISTRY_NAME="ai-hub-sharepoint"
+GCP_REGION=northamerica-south1
+ARTIFACT_REGISTRY_NAME=ai-hub-sharepoint
 NEWS_EXTRACTION_PIPELINE_IMAGE_NAME="$(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/$(ARTIFACT_REGISTRY_NAME)/news_extraction_pipeline:latest"
 
 gcloud-auth:
@@ -29,6 +29,9 @@ build-news-extraction-pipeline-image:
 	-f news_extraction_pipeline/news_extraction_pipeline.dockerfile \
 	-t $(NEWS_EXTRACTION_PIPELINE_IMAGE_NAME) \
 	.
+
+link-docker-to-artifact-registry:
+	gcloud auth configure-docker $(GCP_REGION)-docker.pkg.dev
 
 push-news-extraction-pipeline-image:
 	docker push  $(NEWS_EXTRACTION_PIPELINE_IMAGE_NAME)
