@@ -114,7 +114,7 @@ class NewsExtractionTable(BigQueryTable):
             news_metadata.model_copy(
                 update={
                     "news_id": self._generate_id(news_metadata.news_link),
-                    "published_at": datetime.now(timezone.utc),
+                    "extracted_at": datetime.now(timezone.utc),
                 }
             ).model_dump()  # To convert NewsMetadata in a Python dictionary
             for news_metadata in list_news_metadata
