@@ -46,6 +46,20 @@ class GCPConfig(BaseSettings, validate_assignment=True):
             description="BigQuery Dataset ID",
         ),
     ]
+    NEWS_EXTRACTION_TABLE_ID: Annotated[
+        str,
+        Field(
+            default="dummy-table-name",
+            description="ID of the bigquery table where data from news extraction pipeline is stored",
+        ),
+    ]
+    NEWS_EXTRACTION_TABLE_PK: Annotated[
+        str,
+        Field(
+            default="dummy-pk",
+            description="Name of the column representing the PK",
+        ),
+    ]
     BUCKET_NAME: Annotated[
         str,
         Field(
