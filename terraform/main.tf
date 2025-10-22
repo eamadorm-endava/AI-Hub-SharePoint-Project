@@ -140,7 +140,7 @@ resource "google_bigquery_table" "news_extraction" {
   {
     "name": "image_link",
     "type": "STRING",
-    "mode": "REQUIRED",
+    "mode": "NULLABLE",
     "description": "Link to the main image of the news"
   }
 ]
