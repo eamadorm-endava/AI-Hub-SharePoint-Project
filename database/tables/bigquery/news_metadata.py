@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from utils.gcp.bigquery import insert_rows
 
 from .bq_base import BigQueryTable
-from news_extraction_pipeline.schemas import NewsMetadata
+from database.schemas import NewsMetadata
 from agent.config import GCPConfig
 
 
@@ -48,9 +48,7 @@ class NewsExtractionTable(BigQueryTable):
         Returns:
             None
         """
-        news_metadata.extracted_at = datetime.now(
-            timezone.utc
-        )  # To keep a unique timezone
+        news_metadata.extracted_at = datetime.now(timezone.utc)
 
         try:
             insert_rows(
@@ -58,12 +56,12 @@ class NewsExtractionTable(BigQueryTable):
                 dataset_name=self.dataset_id,
                 project_id=self.project_id,
                 rows=[
-                    NewsMetadata.model_dump_json(),
+                    news_metadata.model_dump(exclude_none=True),
                 ],
             )
 
         except Exception as e:
-            logger.error(f"Error whule inserting news metadata into BigQuery: {e}")
+            logger.error(f"Error while inserting news metadata into BigQuery: {e}")
 
     def add_row(self, news_metadata: NewsMetadata) -> str:
         """
