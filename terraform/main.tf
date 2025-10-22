@@ -80,3 +80,69 @@ resource "google_cloud_run_v2_service_iam_member" "news_extraction_pipeline_auth
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+
+
+########################################## BigQuery ###########################################
+resource "google_bigquery_dataset" "main_dataset" {
+  dataset_id  = var.dataset_id
+  description = "The datasets in Bigquery can be considered as schemas in any other structured database. So this is the schema for the tables."
+  location    = var.gcp_region
+
+  labels = {
+    env = "default"
+  }
+}
+
+resource "google_bigquery_table" "news_extraction" {
+  dataset_id = google_bigquery_dataset.main_dataset.dataset_id
+  table_id   = var.news_extraction_table_id
+
+  deletion_protection = false
+
+  labels = {
+    env         = "default"
+    primary_key = "news_id"
+  }
+
+  schema = <<EOF
+
+[
+  {
+    "name": "news_id",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "ID of the news"
+  },
+  {
+    "name": "title",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Title of the news"
+  },
+  {
+    "name": "published_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Timestamp when the news was published"
+  },
+  {
+    "name": "extracted_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Timestamp when the news was added to the table"
+  },
+  {
+   "name": "news_link",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Link where the news can be read"
+  },
+  {
+    "name": "image_link",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "Link to the main image of the news"
+  }
+]
+EOF
+}
