@@ -3,6 +3,10 @@ import pandas as pd
 from loguru import logger
 from typing import Optional
 from news_extraction_pipeline.extractors.news.news_extractors import NewsExtractor
+from database.tables.bigquery import NewsExtractionTable
+from database.schemas import NewsMetadata
+
+news_extraction_table = NewsExtractionTable()
 
 
 def extract_from_feed(feed_url: str) -> Optional[pd.DataFrame]:
@@ -220,3 +224,29 @@ def convert_datetime_columns_to_str(
     logger.info("Datetime conversion complete.")
 
     return df_copy
+
+
+def store_in_database(df: pd.DataFrame) -> None:
+    """
+    Stores the data obtained in BigQuery
+
+    Args:
+        df: pd.DataFrame -> DataFrame containing the data
+
+    Returns:
+        None
+    """
+    df_copy = df.copy()
+
+    # Rename a column to match the BigQuery schema
+    # action_at -> For timestamps
+    # action_date -> For dates only
+    df_copy.rename(columns={"publish_date": "published_at"}, inplace=True)
+
+    # Get a list of dictionaries, each dictioanry contains the data of a single news
+    # Datetime is respected
+    record_list = df_copy.to_dict(orient="records")
+
+    record_list = [NewsMetadata(**news_data) for news_data in record_list]
+
+    news_extraction_table.add_rows(record_list)
