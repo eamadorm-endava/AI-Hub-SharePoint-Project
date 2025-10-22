@@ -1,14 +1,18 @@
 GCP_PROJECT_ID=p-dev-gce-60pf
-GCP_SA="dev-service-account@p-dev-gce-60pf.iam.gserviceaccount.com"
+GCP_SA=ai-hub-sharepoint-sa@p-dev-gce-60pf.iam.gserviceaccount.com
+GCP_TERRAFORM_SA=terraform-ai-hub-sharepoint@p-dev-gce-60pf.iam.gserviceaccount.com
 GCP_REGION=northamerica-south1
 ARTIFACT_REGISTRY_NAME=ai-hub-sharepoint
 NEWS_EXTRACTION_PIPELINE_IMAGE_NAME="$(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/$(ARTIFACT_REGISTRY_NAME)/news_extraction_pipeline:latest"
 
 gcloud-auth:
 	gcloud config unset auth/impersonate_service_account 
-	gcloud auth application-default login
-	gcloud auth application-default set-quota-project $(GCP_PROJECT_ID)
-	gcloud config set project $(GCP_PROJECT_ID)
+	gcloud auth application-default login --impersonate-service-account $(GCP_SA)
+	export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/.config/gcloud/application_default_credentials.json
+
+gcloud-auth-terraform:
+	gcloud config unset auth/impersonate_service_account 
+	gcloud auth application-default login --impersonate-service-account $(GCP_TERRAFORM_SA)
 	export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/.config/gcloud/application_default_credentials.json
 
 uv-sync:
