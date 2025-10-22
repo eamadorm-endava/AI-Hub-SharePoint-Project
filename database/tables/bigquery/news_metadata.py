@@ -125,19 +125,20 @@ class NewsExtractionTable(BigQueryTable):
             )
         ]
 
-        if news_to_add:
-            logger.info(
-                f"Inserting {len(news_to_add)} new rows into BigQuery table {self.name}"
+        if not news_to_add:
+            logger.warning("All the news has been previously added to the database.")
+            return
+
+        logger.info(
+            f"Inserting {len(news_to_add)} new rows into BigQuery table {self.name}"
+        )
+        try:
+            insert_rows(
+                table_name=self.name,
+                dataset_name=self.dataset_id,
+                project_id=self.project_id,
+                rows=news_to_add,
             )
-            try:
-                insert_rows(
-                    table_name=self.name,
-                    dataset_name=self.dataset_id,
-                    project_id=self.project_id,
-                    rows=news_to_add,
-                )
 
-            except Exception as e:
-                logger.error(f"Error while inserting rows into BigQuery: {e}")
-
-        logger.warning("All the news has been previously added to the database.")
+        except Exception as e:
+            logger.error(f"Error while inserting rows into BigQuery: {e}")
