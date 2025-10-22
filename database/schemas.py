@@ -9,34 +9,7 @@ STRING_NORMALIZER = BeforeValidator(
     lambda text: str(text).strip() if text is not None else None
 )
 
-
-# Common fields
-def datetime_field(mandatory: bool) -> Annotated[datetime, Field, PlainSerializer]:
-    """
-    If not mandatory, add a default value (None) if attribute is not defined when instanciated
-
-    Args:
-        mandatory: bool -> True if it must be set when the class is instanciated, otherwise False
-
-    Returns:
-        Annotated[datetime, Field, PlainSerializer] -> Annotated Datetime Field
-    """
-    field_args = {"description": "Datetime when a resource was created/added, etc"}
-    if not mandatory:
-        field_args["default"] = None
-
-    return Annotated[
-        datetime,
-        Field(**field_args),
-        PlainSerializer(  # Tells pydantic when serializing (converting to a dict or a json string), use the function
-            lambda dt: dt.strftime(r"%Y-%m-%d %H:%M:%S"),
-            when_used="always",
-        ),
-    ]
-
-
-DATETIME_REQUIRED_FIELD = datetime_field(mandatory=True)
-DATETIME_NOT_REQUIRED_FIELD = datetime_field(mandatory=False)
+SERIALIZED_DATETIME_FORMAT = r"%Y-%m-%d %H:%M:%S"
 
 
 class NewsMetadata(BaseModel, validate_assignment=True):
@@ -56,8 +29,25 @@ class NewsMetadata(BaseModel, validate_assignment=True):
         Field(description="Title of the extracted news", min_length=1),
         STRING_NORMALIZER,
     ]
-    published_at: DATETIME_REQUIRED_FIELD  # type: ignore
-    extracted_at: DATETIME_NOT_REQUIRED_FIELD  # type: ignore
+    published_at: Annotated[
+        datetime,
+        Field(description="Datetime when the news was published"),
+        PlainSerializer(  # Tells pydantic when serializing (converting to a dict or a json string), use the function
+            lambda dt: dt.strftime(SERIALIZED_DATETIME_FORMAT),
+            when_used="always",
+        ),
+    ]
+    extracted_at: Annotated[
+        datetime,
+        Field(
+            default=None,  # In case this parameter is not explicitly set
+            description="Datetime when the news was extracted from the web",
+        ),
+        PlainSerializer(  # Tells pydantic when serializing (converting to a dict or a json string), use the function
+            lambda dt: dt.strftime(SERIALIZED_DATETIME_FORMAT),
+            when_used="always",
+        ),
+    ]
     news_link: Annotated[
         str,
         Field(

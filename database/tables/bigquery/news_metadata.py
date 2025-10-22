@@ -91,3 +91,56 @@ class NewsExtractionTable(BigQueryTable):
             self._insert_row(news_metadata=news_metadata)
 
         return news_metadata.news_id
+
+    def add_rows(self, list_news_metadata: list[NewsMetadata]) -> None:
+        """
+        Insert multiple rows in BigQuery at once
+
+        Args:
+            list_news_metadata: list[NewsMetadata] -> List of NewsMetadata objects
+
+        Returns:
+            None
+        """
+        if not isinstance(list_news_metadata, list) or not all(
+            isinstance(data, NewsMetadata) for data in list_news_metadata
+        ):
+            logger.error(
+                "The parameter list_news_metadata must be a list of NewsMetadata objects"
+            )
+
+        # Adding fields that are filled once the data is up to be ingested into the database
+        news_to_add = [
+            news_metadata.model_copy(
+                update={
+                    "news_id": self._generate_id(news_metadata.news_link),
+                    "extracted_at": datetime.now(timezone.utc),
+                }
+            ).model_dump()  # To convert NewsMetadata in a Python dictionary
+            for news_metadata in list_news_metadata
+            # Due to this condition is evaluated before the news_id is created in the NewsMetadata instance
+            # it is required to generate the id instead of calling news_metadata.news_id (at that moment is always None)
+            if not self._id_in_table(
+                primary_key_column_name=self.primary_key,
+                primary_key_row_value=self._generate_id(news_metadata.news_link),
+                table_name=self.name,
+            )
+        ]
+
+        if not news_to_add:
+            logger.warning("All the news has been previously added to the database.")
+            return
+
+        logger.info(
+            f"Inserting {len(news_to_add)} new rows into BigQuery table {self.name}"
+        )
+        try:
+            insert_rows(
+                table_name=self.name,
+                dataset_name=self.dataset_id,
+                project_id=self.project_id,
+                rows=news_to_add,
+            )
+
+        except Exception as e:
+            logger.error(f"Error while inserting rows into BigQuery: {e}")

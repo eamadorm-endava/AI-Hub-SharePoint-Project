@@ -9,6 +9,7 @@ from news_extraction_pipeline.pipeline_steps import (
     filter_by_date_threshold,
     filter_by_keywords,
     convert_datetime_columns_to_str,
+    store_in_database,
 )
 
 news_config = AINewsConfig()
@@ -69,7 +70,10 @@ def main(
         filter_column=news_config.COLUMN_TO_FILTER_BY_KW,
     )
 
-    # Step 5: Convert datetime columns to strings, if any
+    # Step 5: Store data in database
+    store_in_database(articles_filtered_by_keywords)
+
+    # Step 6: Prepare data to be returned
     final_articles = convert_datetime_columns_to_str(
         articles_filtered_by_keywords, string_format=news_config.DATE_STRING_FORMAT
     )

@@ -53,6 +53,8 @@ resource "google_cloud_run_v2_service" "news_extraction_pipeline" {
 
   template {
 
+    service_account = var.gcp_dev_sa
+
     containers {
       image = "${var.gcp_region}-docker.pkg.dev/${var.gcp_project_id}/${var.artifact_registry_name}/${var.news_extraction_pipeline_image_name}:${var.news_extraction_pipeline_image_tag}"
       ports {
@@ -63,6 +65,22 @@ resource "google_cloud_run_v2_service" "news_extraction_pipeline" {
           memory = "2Gi"
           cpu    = "1"
         }
+      }
+      env {
+        name  = "PROJECT_ID"
+        value = var.gcp_project_id
+      }
+      env {
+        name  = "BQ_DATASET_ID"
+        value = var.dataset_id
+      }
+      env {
+        name  = "NEWS_EXTRACTION_TABLE_ID"
+        value = var.news_extraction_table_id
+      }
+      env {
+        name  = "NEWS_EXTRACTION_TABLE_PK"
+        value = var.news_extraction_table_pk
       }
     }
     scaling {
