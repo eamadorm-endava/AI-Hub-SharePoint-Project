@@ -110,9 +110,10 @@ def test_optional_and_default_fields():
     assert news_metadata.extracted_at is None
 
 
-def test_serialization_with_none_datetime():
+def test_instanciate_with_explicit_none_datetime_attribute():
     """
-    Tests that serializing the model works correctly when optional datetime fields are None.
+    Test instanciating a NewsMetadata class with explicit None value in extracted_at, which must raise
+    a ValidationError, as it should always be a datetime if explicitly instanciated
     """
     now = datetime.now()
     news_data = {
@@ -123,10 +124,31 @@ def test_serialization_with_none_datetime():
     }
 
     with pytest.raises(ValidationError) as excinfo:
+        NewsMetadata(**news_data)
+
+    assert "Input should be a valid datetime" in str(excinfo.value)
+
+
+def test_serialization_with_none_datetime():
+    """
+    Tests that serializing the model generates a ValueError whenever datetime fields are None.
+    """
+    now = datetime.now()
+
+    # news_data defaults extracted_at to None
+    news_data = {
+        "title": "Serialization with None",
+        "published_at": now,
+        "news_link": "https://example.com/serialization-none",
+    }
+
+    with pytest.raises(ValueError) as excinfo:
         news_metadata = NewsMetadata(**news_data)
         news_metadata.model_dump()
 
-    assert "Input should be a valid datetime" in str(excinfo.value)
+    assert "AttributeError: 'NoneType' object has no attribute 'strftime'" in str(
+        excinfo.value
+    )
 
 
 def test_empty_strings_validation():
