@@ -7,7 +7,7 @@ variable "gcp_project_id" {
 variable "gcp_dev_sa" {
   type        = string
   description = "GCP Service Account that CloudRun will use to authenticate"
-  default     = "dev-service-account@p-dev-gce-60pf.iam.gserviceaccount.com"
+  default     = "ai-hub-sharepoint-sa@p-dev-gce-60pf.iam.gserviceaccount.com"
 }
 
 variable "gcp_region" {
