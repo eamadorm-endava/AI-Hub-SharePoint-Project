@@ -102,6 +102,13 @@ class NewsExtractionTable(BigQueryTable):
         Returns:
             None
         """
+        if not isinstance(list_news_metadata, list) or not all(
+            isinstance(data, NewsMetadata) for data in list_news_metadata
+        ):
+            logger.error(
+                "The parameter list_news_metadata must be a list of NewsMetadata objects"
+            )
+
         # Adding fields that are filled once the data is up to be ingested into the database
         news_to_add = [
             news_metadata.model_copy(
@@ -118,16 +125,19 @@ class NewsExtractionTable(BigQueryTable):
             )
         ]
 
-        logger.info(
-            f"Inserting {len(news_to_add)} new rows into BigQuery table {self.name}"
-        )
-        try:
-            insert_rows(
-                table_name=self.name,
-                dataset_name=self.dataset_id,
-                project_id=self.project_id,
-                rows=news_to_add,
+        if news_to_add:
+            logger.info(
+                f"Inserting {len(news_to_add)} new rows into BigQuery table {self.name}"
             )
+            try:
+                insert_rows(
+                    table_name=self.name,
+                    dataset_name=self.dataset_id,
+                    project_id=self.project_id,
+                    rows=news_to_add,
+                )
 
-        except Exception as e:
-            logger.error(f"Error while inserting rows into BigQuery: {e}")
+            except Exception as e:
+                logger.error(f"Error while inserting rows into BigQuery: {e}")
+
+        logger.warning("All the news has been previously added to the database.")
