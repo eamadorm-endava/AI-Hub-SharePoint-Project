@@ -3,10 +3,6 @@ from pydantic_ai.models.google import GoogleModel, GoogleModelSettings
 from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.mcp import load_mcp_servers
 from loguru import logger
-import sys
-
-sys.path.append("..")
-
 from agent.config import AgentConfig
 from agent.tools import (
     load_file_from_gcs,
