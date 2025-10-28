@@ -8,15 +8,24 @@ import sys
 sys.path.append("..")
 
 from agent.config import AgentConfig
-from agent.tools.cloud_storage import (
+from agent.tools import (
     load_file_from_gcs,
     list_files_in_gcs_bucket,
     upload_text_to_gcs,
+    text_to_speech,
+    generate_images,
+    query_news_table,
 )
-from agent.tools.text_to_speech import text_to_speech
-from agent.tools.image_generation import generate_images
 from agent.auxiliars import load_system_prompt
 
+raw_tools = [
+    load_file_from_gcs,
+    list_files_in_gcs_bucket,
+    upload_text_to_gcs,
+    text_to_speech,
+    generate_images,
+    query_news_table,
+]
 
 agent_config = AgentConfig()
 
@@ -36,13 +45,7 @@ agent = Agent(
     model_settings=model_settings,
     system_prompt=system_prompt,
     toolsets=servers,
-    tools=[
-        Tool(upload_text_to_gcs),
-        Tool(load_file_from_gcs),
-        Tool(list_files_in_gcs_bucket),
-        Tool(text_to_speech),
-        Tool(generate_images),
-    ],
+    tools=[Tool(tool) for tool in raw_tools],
 )
 
 
