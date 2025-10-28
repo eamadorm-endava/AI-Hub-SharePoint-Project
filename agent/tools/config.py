@@ -87,7 +87,7 @@ class TTSToolConfig(GCPToolConfig):
     SECOND_SPEAKER_NAME: Annotated[
         str,
         Field(
-            default="Emma",
+            default="Matt",
             description="Name of the second custom person for TTS.",
         ),
     ]
