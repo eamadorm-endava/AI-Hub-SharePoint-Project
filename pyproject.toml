@@ -1,0 +1,44 @@
+[project]
+name = "ai-hub-sharepoint-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+ai-agent = [
+    "google-genai>=1.45.0",
+    "pydantic-ai>=1.1.0",
+]
+ai-news-automation = [
+    "bs4>=0.0.2",
+    "feedparser>=6.0.12",
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
+    "requests>=2.32.5",
+]
+gcp = [
+    "gcsfs>=2025.3.0",
+    "google-auth>=2.38.0",
+    "google-cloud-bigquery>=3.31.0",
+    "google-cloud-iam>=2.19.0",
+    "google-cloud-run>=0.10.17",
+    "google-cloud-secret-manager>=2.23.2",
+    "google-cloud-storage>=3.1.0",
+]
+dev = [
+    "argparse>=1.4.0",
+    "datetime>=5.5",
+    "fastapi>=0.118.2",
+    "loguru>=0.7.3",
+    "pre-commit>=4.3.0",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.11.0",
+    "pytest>=8.4.2",
+    "uvicorn>=0.37.0",
+]
+notebooks = [
+    "dotenv>=0.9.9",
+    "ipykernel>=6.30.1",
+]
