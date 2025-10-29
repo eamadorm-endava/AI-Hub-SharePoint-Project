@@ -6,7 +6,7 @@ from .cloud_storage import (
 from .image import generate_images
 from .audio import text_to_speech
 from .bigquery import query_news_table
-from .video_generation import generate_video
+from .video import generate_video
 
 __all__ = [
     "text_to_speech",
