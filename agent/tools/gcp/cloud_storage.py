@@ -24,7 +24,6 @@ def upload_text_to_gcs(blob_data: TextBlob) -> None:
     text = blob_data.text
 
     logger.debug(f"{blob_name = }")
-    logger.debug(f"{text = }")
 
     try:
         upload_bytes(

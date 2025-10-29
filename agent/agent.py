@@ -42,7 +42,7 @@ agent = Agent(
     model=model,
     model_settings=model_settings,
     system_prompt=system_prompt,
-    # toolsets=servers,
+    toolsets=servers,
     tools=[Tool(tool) for tool in raw_tools],
 )
 

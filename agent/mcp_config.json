@@ -3,18 +3,6 @@
         "fetch": {
             "command": "uvx",
             "args": ["mcp-server-fetch"]
-        },
-        "git": {
-            "command": "uvx",
-            "args": ["mcp-server-git", "--repository", "/workspaces/AI-Hub-SharePoint-Agent"]
-        },
-        "filesystem": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@modelcontextprotocol/server-filesystem",
-                "/workspaces/AI-Hub-SharePoint-Agent"
-            ]
         }
     }
 }
