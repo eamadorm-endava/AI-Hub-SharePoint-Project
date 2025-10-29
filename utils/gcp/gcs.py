@@ -298,7 +298,7 @@ def list_blobs(bucket_name: str) -> list[dict]:
             "content_type": blob.content_type,
             "public_url": blob.public_url,
             "storage_class": blob.storage_class,
-            "size": blob.size,
+            "size_bytes": blob.size,
             "created_at": blob.time_created,  # datetime object
             "updated_at": blob.updated,  # datetime object
         }
