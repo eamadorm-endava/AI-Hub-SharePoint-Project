@@ -292,7 +292,7 @@ def list_blobs(bucket_name: str) -> list[dict]:
 
     blobs = client.list_blobs(bucket_name)
 
-    blobs_name = [
+    blobs_data = [
         {
             "name": blob.name,
             "content_type": blob.content_type,
@@ -305,4 +305,4 @@ def list_blobs(bucket_name: str) -> list[dict]:
         for blob in blobs
     ]
 
-    return blobs_name
+    return blobs_data
