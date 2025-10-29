@@ -1,0 +1,21 @@
+/*
+Calendar table, from 2025-01-01 to 2100-01-01
+*/
+
+config {
+    type: "table"
+    tags:["dimension"] // Saying it is a dimension table
+}
+
+select
+    d as calendar_date,
+    extract(year from d) as year,
+    extract(quarter from d) as quarter,
+    extract(month from d) as month,
+    extract(week from d) as week,
+    extract(day from d) as day,
+    format_date("%A", d) as day_name,
+    extract(dayofweek from d) as day_of_week_num
+
+from unnest(generate_date_array('2025-01-01', '2100-01-01', interval 1 day)) as d
+order by d asc
