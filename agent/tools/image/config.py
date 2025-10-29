@@ -1,6 +1,6 @@
 from pydantic import Field
 from typing import Annotated
-from agent.tools.config import GCPToolConfig
+from ..config import GCPToolConfig
 
 
 class ImaGenToolConfig(GCPToolConfig, validate_assignment=True):

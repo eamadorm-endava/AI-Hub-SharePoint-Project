@@ -2,8 +2,8 @@ from loguru import logger
 from google import genai
 from google.genai import types
 import asyncio
-from agent.tools.image.config import ImaGenToolConfig
-from agent.tools.image.schemas import ImaGenRequest, Image
+from .config import ImaGenToolConfig
+from .schemas import ImaGenRequest, Image
 from utils.gcp.gcs import upload_bytes
 
 imagen_config = ImaGenToolConfig()
