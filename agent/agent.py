@@ -5,7 +5,7 @@ from pydantic_ai.mcp import load_mcp_servers
 from loguru import logger
 from agent.config import AgentConfig
 from agent.tools import (
-    load_file_from_gcs,
+    load_text_file_from_gcs,
     list_files_in_gcs_bucket,
     upload_text_to_gcs,
     text_to_speech,
@@ -16,7 +16,7 @@ from agent.tools import (
 from agent.auxiliars import load_system_prompt
 
 raw_tools = [
-    load_file_from_gcs,
+    load_text_file_from_gcs,
     list_files_in_gcs_bucket,
     upload_text_to_gcs,
     text_to_speech,

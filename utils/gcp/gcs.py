@@ -276,7 +276,7 @@ def get_file(
     return memory_blob
 
 
-def list_blobs(bucket_name: str) -> list[str]:
+def list_blobs(bucket_name: str) -> list[dict]:
     """
     List all the blobs inside a GCS bucket.
 
@@ -284,7 +284,7 @@ def list_blobs(bucket_name: str) -> list[str]:
         bucket_name: str -> Name of the GCS bucket.
 
     Returns:
-        list[str] -> List of blob names inside the bucket.
+        list[dict] -> List of dictionaries with info related to each blob.
     """
     # bucket_exists already has error handlers
     if not bucket_exists(bucket_name):
@@ -292,6 +292,17 @@ def list_blobs(bucket_name: str) -> list[str]:
 
     blobs = client.list_blobs(bucket_name)
 
-    blobs_name = [blob.name for blob in blobs]
+    blobs_data = [
+        {
+            "name": blob.name,
+            "content_type": blob.content_type,
+            "public_url": blob.public_url,
+            "storage_class": blob.storage_class,
+            "size_bytes": blob.size,
+            "created_at": blob.time_created,  # datetime object
+            "updated_at": blob.updated,  # datetime object
+        }
+        for blob in blobs
+    ]
 
-    return blobs_name
+    return blobs_data

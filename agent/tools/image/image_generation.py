@@ -2,8 +2,8 @@ from loguru import logger
 from google import genai
 from google.genai import types
 import asyncio
-from agent.tools.config import ImaGenToolConfig
-from agent.tools.tool_schemas import ImaGenRequest, Image
+from .config import ImaGenToolConfig
+from .schemas import ImaGenRequest, Image
 from utils.gcp.gcs import upload_bytes
 
 imagen_config = ImaGenToolConfig()
@@ -11,7 +11,7 @@ imagen_config = ImaGenToolConfig()
 genai_client = genai.Client(api_key=imagen_config.GEMINI_API_KEY.get_secret_value())
 
 
-async def generate_image(
+async def _generate_image(
     prompt: str,
     general_image_name: str,
     llm_model: str = imagen_config.MODEL_NAME,
@@ -87,7 +87,7 @@ async def generate_images(image_requests: list[ImaGenRequest]) -> list[Image]:
 
     logger.debug("Preparing generation requests")
     for image_request in image_requests:
-        task = generate_image(
+        task = _generate_image(
             prompt=image_request.prompt, general_image_name=image_request.image_name
         )
         generation_tasks.append(task)

@@ -3,7 +3,8 @@ import wave
 from io import BytesIO
 from google import genai
 from google.genai import types
-from agent.tools.config import TTSToolConfig
+from .config import TTSToolConfig
+from .schemas import TTSRequest, TTSResponse
 from utils.gcp.gcs import upload_bytes
 
 
@@ -14,7 +15,7 @@ genai_client = genai.Client(api_key=tts_config.GEMINI_API_KEY.get_secret_value()
 
 # Code adapted from: https://ai.google.dev/gemini-api/docs/speech-generation
 # Set up the wave file:
-def pcm_to_wav_bytes(
+def _pcm_to_wav_bytes(
     pcm_data: bytes, sample_rate: int = 24000, channels: int = 1
 ) -> bytes:
     """
@@ -41,7 +42,7 @@ def pcm_to_wav_bytes(
     return buffer.getvalue()  # Return bytes data
 
 
-def single_speaker_tts_audio(text: str) -> bytes:
+def _single_speaker_tts_audio(text: str) -> bytes:
     """
     Generates audio from text using the Gemini TTS API and returns the audio data.
 
@@ -73,12 +74,12 @@ def single_speaker_tts_audio(text: str) -> bytes:
 
     # Convert PCM to WAV bytes
     logger.debug("Converting PCM to WAV bytes...")
-    wav_bytes = pcm_to_wav_bytes(audio_data)
+    wav_bytes = _pcm_to_wav_bytes(audio_data)
 
     return wav_bytes
 
 
-def multi_speaker_tts_audio(text: str) -> bytes:
+def _multi_speaker_tts_audio(text: str) -> bytes:
     """
     Generates multi-speaker audio from text using the Gemini TTS API and returns the audio data.
 
@@ -123,65 +124,38 @@ def multi_speaker_tts_audio(text: str) -> bytes:
 
     # Convert PCM to WAV bytes
     logger.debug("Converting PCM to WAV bytes...")
-    wav_bytes = pcm_to_wav_bytes(audio_data)
+    wav_bytes = _pcm_to_wav_bytes(audio_data)
 
     return wav_bytes
 
 
-def text_to_speech(
-    title: str,
-    text: str,
-    mode: str,
-    gcs_path: str = tts_config.GCS_PATH,
-    make_public: bool = True,
-) -> str | None:
+def text_to_speech(tts_request: TTSRequest) -> TTSResponse:
     """
     Orchestrator function that generates the single speaker audio and stores it into GCS
 
     Args:
-        title: str -> Title of the audio generated. (e.g. my_audio)
-        text: str -> The text to be converted into speech.
-        mode: str -> Either 'single' or 'multi' speakers
-        gcs_path: str -> Path where the audio will be stored in gcs. (e.g. audio/)
-        make_public: bool -> True if the blob will be public, otherwise False
-
+        tts_request: TTSRequest -> Class containing the parameters to create the speech
 
     Returns:
         gcs_audio_path: Path where the audio was stored
     """
     logger.info("Using Text to Speech Tool...")
 
-    if not all(
-        isinstance(param, str) and param.strip() != ""
-        for param in [title, gcs_path, text]
-    ):
-        logger.error(
-            "Parameters: title, gcs_path, and text must be non-null strings, "
-            f"got {type(title)}, {type(gcs_path)}, {type(text)}"
-        )
-        return
-    if mode not in ["single", "multi"]:
-        logger.error(
-            "'mode' can only accept 'single' or 'multi', related to the number of speakers in the audio"
-        )
-        return
-
     audio_generation = {
-        "single": single_speaker_tts_audio,
-        "multi": multi_speaker_tts_audio,
+        "single": _single_speaker_tts_audio,
+        "multi": _multi_speaker_tts_audio,
     }
 
-    # Cleaning the parameters
-    title = title.strip().lower().replace(" ", "_").replace(".", "")
+    title = tts_request.title
+    text = tts_request.text
+    gcs_path = tts_config.GCS_PATH.rstrip("/")
+    mode = tts_request.mode
+    full_gcs_path = f"{gcs_path}/{tts_request.title}.wav"
 
-    gcs_path = gcs_path.rstrip("/")
-
-    full_gcs_path = f"{gcs_path}/{title}.wav"
-
-    logger.debug(f"{title =}")
-    logger.debug(f"{text =}")
-    logger.debug(f"{gcs_path =}")
-    logger.debug(f"{mode =}")
+    logger.debug(f"{title = }")
+    logger.debug(f"{text = }")
+    logger.debug(f"{gcs_path = }")
+    logger.debug(f"{mode = }")
     logger.debug(f"{full_gcs_path =}")
 
     logger.debug("Creating audio...")
@@ -197,14 +171,16 @@ def text_to_speech(
         blob_name=full_gcs_path,
         content_type="audio/wav",
         bucket_name=tts_config._CLOUD_PROVIDER.BUCKET_NAME,
-        make_public=make_public,
+        make_public=tts_config.PUBLIC_AUDIO,
     )
 
     if blob_public_url:
         logger.info(f"Blob can be access through: {blob_public_url}")
-        return blob_public_url
 
-    gcs_audio_path = f"gs://{tts_config._CLOUD_PROVIDER.BUCKET_NAME}/{full_gcs_path}"
-    logger.info(f"Audio stored in {gcs_audio_path}")
+    output = TTSResponse(
+        title=title,
+        public_url=blob_public_url,
+        full_gcs_path=full_gcs_path,
+    )
 
-    return gcs_audio_path
+    return output

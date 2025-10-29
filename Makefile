@@ -6,7 +6,8 @@ ARTIFACT_REGISTRY_NAME=ai-hub-sharepoint
 NEWS_EXTRACTION_PIPELINE_IMAGE_NAME="$(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/$(ARTIFACT_REGISTRY_NAME)/news_extraction_pipeline:latest"
 
 gcloud-auth:
-	gcloud config unset auth/impersonate_service_account 
+	gcloud config unset auth/impersonate_service_account
+	gcloud config set project $(GCP_PROJECT_ID)
 	gcloud auth application-default login --impersonate-service-account $(GCP_SA)
 	export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/.config/gcloud/application_default_credentials.json
 

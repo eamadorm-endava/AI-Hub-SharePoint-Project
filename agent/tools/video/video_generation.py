@@ -2,10 +2,9 @@ from loguru import logger
 import time
 from google import genai
 from google.genai import types
-
 from typing import Literal
-from agent.tools.config import VideoGenToolConfig
-from agent.tools.tool_schemas import VideoGenRequest, VideoGenResponse
+from .config import VideoGenToolConfig
+from .schemas import VideoGenRequest, VideoGenResponse
 from utils.gcp.gcs import upload_bytes
 
 
@@ -16,7 +15,7 @@ genai_client = genai.Client(api_key=video_config.GEMINI_API_KEY.get_secret_value
 
 # Code adapted from: https://ai.google.dev/gemini-api/docs/video?example=dialogue#veo-model-parameters
 # To obtain the bytes of the video, check the documentation: https://googleapis.github.io/python-genai/#veo
-def generate_single_video(
+def _generate_single_video(
     prompt: str,
     aspect_ratio: Literal["9:16", "16:9"],
     duration_seconds: Literal[5, 6, 8],
@@ -75,7 +74,7 @@ def generate_video(video_request: VideoGenRequest) -> VideoGenResponse:
     logger.debug(f"aspect_ratio = {video_request.aspect_ratio}")
     logger.debug(f"duration_seconds = {video_request.duration_seconds}")
 
-    video_bytes = generate_single_video(
+    video_bytes = _generate_single_video(
         prompt=video_request.prompt,
         aspect_ratio=video_request.aspect_ratio,
         duration_seconds=video_request.duration_seconds,
