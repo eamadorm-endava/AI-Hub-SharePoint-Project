@@ -3,8 +3,8 @@ from .cloud_storage import (
     load_file_from_gcs,
     list_files_in_gcs_bucket,
 )
-from .image_generation import generate_images
-from .audio import text_to_speech
+from .image.image_generation import generate_images
+from .audio.text_to_speech import text_to_speech
 from .bigquery import query_news_table
 from .video_generation import generate_video
 

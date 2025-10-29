@@ -3,7 +3,7 @@ import wave
 from io import BytesIO
 from google import genai
 from google.genai import types
-from agent.tools.config import TTSToolConfig
+from agent.tools.audio.config import TTSToolConfig
 from agent.tools.audio.schemas import TTSRequest, TTSResponse
 from utils.gcp.gcs import upload_bytes
 
@@ -148,7 +148,7 @@ def text_to_speech(tts_request: TTSRequest) -> TTSResponse:
 
     title = tts_request.title
     text = tts_request.text
-    gcs_path = tts_request.gcs_path.rstrip("/")
+    gcs_path = tts_config.GCS_PATH.rstrip("/")
     mode = tts_request.mode
     full_gcs_path = f"{gcs_path}/{tts_request.title}.wav"
 

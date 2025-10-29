@@ -1,8 +1,5 @@
 from pydantic import BaseModel, Field, HttpUrl
 from typing import Annotated, Optional, Literal
-from agent.tools.config import TTSToolConfig
-
-tts_config = TTSToolConfig()
 
 
 class TTSRequest(BaseModel, validate_assignment=True):
@@ -24,14 +21,6 @@ class TTSRequest(BaseModel, validate_assignment=True):
         Literal["single", "multi"],
         Field(
             description="Define if the speech is single or multi speaker",
-        ),
-    ]
-    gcs_path: Annotated[
-        str,
-        Field(
-            default=tts_config.TTS_MODEL,
-            description="Path where the audio will be stored in gcs. (e.g. audio/)",
-            pattern=r"^(\w/)*\w+$",
         ),
     ]
 
