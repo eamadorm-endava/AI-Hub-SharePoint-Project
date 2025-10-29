@@ -31,7 +31,7 @@ class TTSRequest(BaseModel, validate_assignment=True):
         Field(
             default=tts_config.TTS_MODEL,
             description="Path where the audio will be stored in gcs. (e.g. audio/)",
-            pattern=r"^[\w/]+$",
+            pattern=r"^(\w/)*\w+$",
         ),
     ]
 
