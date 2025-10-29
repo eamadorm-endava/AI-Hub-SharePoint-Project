@@ -98,6 +98,13 @@ class TTSToolConfig(GCPToolConfig):
             description="Path inside the GCS Bucket where the audio generated will be stored",
         ),
     ]
+    PUBLIC_AUDIO: Annotated[
+        bool,
+        Field(
+            default=True,
+            description="True if the blob will be public, otherwise False",
+        ),
+    ]
 
     @property
     def tool_name(self) -> str:
