@@ -1,0 +1,32 @@
+/*
+This file will create a new table in BigQuery
+It uses the table previously created with terraform: news_metadata
+*/
+
+config {
+    type:"incremental_table",
+    uniqueKey:["date"]
+}
+
+select
+    cal.calendar_date as date,
+    countif(news.published_at is not null) as number_of_news_published,
+    countif(news.image_link is not null) as news_with_image_link,
+    safe_divide(countif(news.image_link is not null), countif(news.published_at is not null)) as percent_news_with_image,
+    struct(
+        array_agg(title) as title,
+        array_agg(news_link) as news_link
+    ) as news_data
+
+
+from ${ref("ai_hub_sharepoint", "calendar")} cal
+left join ${ref("ai_hub_sharepoint","news_metadata")} news on date(news.published_at) = cal.calendar_date
+where cal.calendar_date <= current_date()
+${when(
+    incremental(), 
+    `and cal.calendar_date > (select max(date) from ${self()})`, //When incremental is True
+    // when incremental is false
+)
+}
+group by 1
+order by 1 desc
