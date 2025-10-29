@@ -3,8 +3,8 @@ import wave
 from io import BytesIO
 from google import genai
 from google.genai import types
-from agent.tools.audio.config import TTSToolConfig
-from agent.tools.audio.schemas import TTSRequest, TTSResponse
+from .config import TTSToolConfig
+from .schemas import TTSRequest, TTSResponse
 from utils.gcp.gcs import upload_bytes
 
 
