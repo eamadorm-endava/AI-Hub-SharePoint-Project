@@ -94,4 +94,6 @@ def generate_video(video_request: VideoGenRequest) -> VideoGenResponse:
     )
     logger.info(f"Video successfully stored in GCS: {video_url}")
 
-    return video_url
+    result = VideoGenResponse(video_url=video_url)
+
+    return result

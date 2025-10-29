@@ -11,6 +11,7 @@ from agent.tools import (
     text_to_speech,
     generate_images,
     query_news_table,
+    generate_video,
 )
 from agent.auxiliars import load_system_prompt
 
@@ -21,6 +22,7 @@ raw_tools = [
     text_to_speech,
     generate_images,
     query_news_table,
+    generate_video,
 ]
 
 agent_config = AgentConfig()
