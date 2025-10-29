@@ -6,6 +6,7 @@ from .cloud_storage import (
 from .image_generation import generate_images
 from .text_to_speech import text_to_speech
 from .bigquery import query_news_table
+from .video_generation import generate_video
 
 __all__ = [
     "upload_text_to_gcs",
@@ -14,4 +15,5 @@ __all__ = [
     "generate_images",
     "text_to_speech",
     "query_news_table",
+    "generate_video",
 ]
