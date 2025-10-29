@@ -1,0 +1,12 @@
+/*
+This file declares a table that already exists in BigQuery.
+
+Dataform will not try to create it, only will use it as reference.
+*/
+config {
+    type: "declaration",
+    database: "p-dev-gce-60pf", // GCP Project ID
+    schema: "ai_hub_sharepoint",       // BQ Dataset where the table created lives
+    name: "news_metadata"  // Table name
+    tags: ["dimension"] // This is a dimension table
+}
