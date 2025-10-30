@@ -5,7 +5,8 @@ It uses the table previously created with terraform: news_metadata
 
 config {
     type:"incremental",
-    uniqueKey:["date"]
+    uniqueKey:["date"],
+    tags: ["daily"],
 }
 
 select
