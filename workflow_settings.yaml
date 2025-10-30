@@ -1,4 +1,5 @@
 defaultProject: p-dev-gce-60pf
 defaultDataset: ai_hub_sharepoint
+defaultLocation: northamerica-south1
 defaultAssertionDataset: dataform_assertions
 dataformCoreVersion: 3.0.26

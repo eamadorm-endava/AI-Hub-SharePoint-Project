@@ -4,7 +4,7 @@ It uses the table previously created with terraform: news_metadata
 */
 
 config {
-    type:"incremental_table",
+    type:"incremental",
     uniqueKey:["date"]
 }
 
@@ -14,8 +14,8 @@ select
     countif(news.image_link is not null) as news_with_image_link,
     safe_divide(countif(news.image_link is not null), countif(news.published_at is not null)) as percent_news_with_image,
     struct(
-        array_agg(title) as title,
-        array_agg(news_link) as news_link
+        array_agg(title ignore nulls) as title,
+        array_agg(news_link ignore nulls) as news_link
     ) as news_data
 
 

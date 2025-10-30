@@ -8,5 +8,4 @@ config {
     database: "p-dev-gce-60pf", // GCP Project ID
     schema: "ai_hub_sharepoint",       // BQ Dataset where the table created lives
     name: "news_metadata"  // Table name
-    tags: ["dimension"] // This is a dimension table
 }
