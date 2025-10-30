@@ -3,7 +3,7 @@ from typing import Annotated
 from ..config import GCPToolConfig
 
 
-class TTSToolConfig(GCPToolConfig):
+class AudioConfig(GCPToolConfig):
     """
     Configuration class for Text-to-Speech (TTS) tool.
     Inherits API key loading logic from GCPToolConfig.
@@ -57,6 +57,13 @@ class TTSToolConfig(GCPToolConfig):
         Field(
             default=True,
             description="True if the blob will be public, otherwise False",
+        ),
+    ]
+    TEMP_LOCAL_STORAGE: Annotated[
+        str,
+        Field(
+            default="./temp/",
+            description="Folder where files could be temporally stored",
         ),
     ]
 
