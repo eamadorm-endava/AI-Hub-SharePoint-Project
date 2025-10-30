@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 from typing import Annotated, Literal, Optional
 from datetime import datetime
 
@@ -54,6 +54,8 @@ class Blob(BaseModel, validate_assignment=True):
 
 
 class TextBlob(Blob):
+    model_config = ConfigDict(validate_assignment=True)
+
     name: Annotated[
         str,
         Field(
