@@ -8,7 +8,7 @@ class Blob(BaseModel, validate_assignment=True):
         str,
         Field(
             description="Generic blob name with extension (e.g. folder/file.txt)",
-            pattern=r"^([\w-]+/)*[\w-]+\.[a-z]+$",
+            pattern=r"^([\w-]+/)*[\w-]+\.[A-Za-z0-9]+$",
         ),
     ]
     content_type: Annotated[
