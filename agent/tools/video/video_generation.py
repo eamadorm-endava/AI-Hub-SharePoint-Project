@@ -148,6 +148,7 @@ def generate_podcast_video(video_request: PodcastVideoRequest) -> None:
         origin_file_path=temp_file,
         destination_file_path=f"{gcs_video_path}/{podcast_name}",
         bucket_name=video_config._CLOUD_PROVIDER.BUCKET_NAME,
+        make_public=podcast_config.IS_PUBLIC,
     )
 
     # os does not allow to remove a folder if its not empty, shutil does

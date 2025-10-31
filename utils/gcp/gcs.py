@@ -102,7 +102,8 @@ def upload_file(
     origin_file_path: str,
     bucket_name: str,
     destination_file_path: str = None,
-):
+    make_public: str = False,
+) -> None | str:
     """
     Upload a local file into a GCS bucket.
 
@@ -112,6 +113,10 @@ def upload_file(
                                 Ex: C:Users/my_folder/file.txt
             destination_file_path: str -> GCS path of the file to be uploaded
                                 Ex: gcs_folder/new_file.txt
+            make_public: bool -> Make a blob public. Default to False
+
+    Return:
+        None | str -> Public URL if make_public = True, otherwise None
     """
     # Checks for the origin_file_path parameter
     if not isinstance(origin_file_path, str) or origin_file_path == "":
@@ -146,6 +151,10 @@ def upload_file(
     # Upload file in the bucket
     blob = bucket.blob(destination_file_path)
     blob.upload_from_filename(origin_file_path)
+
+    if make_public:
+        blob.make_public()
+        return blob.public_url
 
     logger.info(
         f"{origin_file_path.split('/')[-1]} stored in GCS as {destination_file_path}"
