@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, HttpUrl
-from typing import Annotated, Literal
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict
+from typing import Annotated, Literal, Optional
 
 
 class VideoGenRequest(BaseModel, validate_assignment=True):
@@ -56,5 +56,22 @@ class PodcastVideoRequest(BaseModel, validate_assignment=True):
         Field(
             description="Name of the audio blob in cloud storage (e.g. gcs_path/file_name.wav)",
             pattern=r"^(\w+/)*\w+\.wav$",
+        ),
+    ]
+
+
+class PodcastVideoResponse(PodcastVideoRequest):
+    model_config = ConfigDict(validate_assignment=True)
+    gcs_video_path: Annotated[
+        str,
+        Field(
+            description="Name of the video podcast blob in cloud storage (e.g. gcs_path/file_name.mp4)",
+            pattern=r"^(\w+/)*\w+\.mp4$",
+        ),
+    ]
+    public_url: Annotated[
+        Optional[HttpUrl],
+        Field(
+            description="Public URL where the podcast video can be access to",
         ),
     ]

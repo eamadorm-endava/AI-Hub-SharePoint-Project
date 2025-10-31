@@ -7,7 +7,12 @@ from google import genai
 from google.genai import types
 from typing import Literal
 from .config import VideoGenToolConfig, PodcastVideoConfig
-from .schemas import VideoGenRequest, VideoGenResponse, PodcastVideoRequest
+from .schemas import (
+    VideoGenRequest,
+    VideoGenResponse,
+    PodcastVideoRequest,
+    PodcastVideoResponse,
+)
 from utils.gcp.gcs import upload_bytes, get_file, upload_file
 from ..audio.audio_data import _get_audio
 
@@ -103,10 +108,16 @@ def generate_video(video_request: VideoGenRequest) -> VideoGenResponse:
     return result
 
 
-def generate_podcast_video(video_request: PodcastVideoRequest) -> None:
+def generate_podcast_video(video_request: PodcastVideoRequest) -> PodcastVideoResponse:
     """
     Orchestration function that adds a cover image to the podcast audio,
     stores it into Google Cloud Storage
+
+    Args:
+        video_request: PodcastVideoRequest -> Pydantic model containing the parameters for the video generation
+
+    Returns:
+        PodcastVideoResponse -> Object containing metadata related to the video
     """
     logger.info("Generating podcast video...")
 
@@ -144,12 +155,22 @@ def generate_podcast_video(video_request: PodcastVideoRequest) -> None:
     )
 
     gcs_video_path = podcast_config.GCS_PATH.strip("/")
-    upload_file(
+    blob_name = f"{gcs_video_path}/{podcast_name}"
+
+    public_url = upload_file(
         origin_file_path=temp_file,
-        destination_file_path=f"{gcs_video_path}/{podcast_name}",
+        destination_file_path=blob_name,
         bucket_name=video_config._CLOUD_PROVIDER.BUCKET_NAME,
         make_public=podcast_config.IS_PUBLIC,
     )
 
     # os does not allow to remove a folder if its not empty, shutil does
     shutil.rmtree(temp_local_storage)
+
+    output = PodcastVideoResponse(
+        gcs_audio_path=gcs_audio_path,
+        gcs_video_path=blob_name,
+        public_url=public_url,
+    )
+
+    return output
