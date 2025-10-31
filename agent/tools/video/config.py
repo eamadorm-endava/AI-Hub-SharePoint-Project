@@ -1,4 +1,5 @@
 from pydantic import Field
+from pydantic_settings import BaseSettings
 from typing import Annotated
 from ..config import GCPToolConfig
 
@@ -35,3 +36,39 @@ class VideoGenToolConfig(GCPToolConfig, validate_assignment=True):
     @property
     def tool_name(self) -> str:
         return "video_generation"
+
+
+class PodcastVideoConfig(BaseSettings):
+    COVER_IMAGE: Annotated[
+        str,
+        Field(
+            default="images/ai_conversations_cover.png",
+            pattern=r"^(\w+/)*\w+\.png$",
+        ),
+    ]
+    TEMP_LOCAL_STORAGE: Annotated[
+        str,
+        Field(
+            default="./temp/",
+            description="Folder where files could be temporally stored",
+        ),
+    ]
+    GCS_PATH: Annotated[
+        str,
+        Field(
+            default="videos/",
+            description="Path inside the GCS Bucket where the audio generated will be stored",
+        ),
+    ]
+    IS_PUBLIC: Annotated[
+        bool,
+        Field(
+            default=True,
+            description="True if the blob will be public, otherwise False",
+        ),
+    ]
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        extra = "allow"

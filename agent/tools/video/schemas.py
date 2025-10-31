@@ -48,3 +48,13 @@ class VideoGenResponse(BaseModel, validate_assignment=True):
 
     class Config:
         validate_assignment = True
+
+
+class PodcastVideoRequest(BaseModel, validate_assignment=True):
+    gcs_audio_path: Annotated[
+        str,
+        Field(
+            description="Name of the audio blob in cloud storage (e.g. gcs_path/file_name.wav)",
+            pattern=r"^(\w+/)*\w+\.wav$",
+        ),
+    ]
