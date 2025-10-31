@@ -13,6 +13,7 @@ from agent.tools import (
     generate_images,
     query_news_table,
     generate_video,
+    generate_podcast_video,
 )
 from agent.auxiliars import load_system_prompt
 
@@ -25,6 +26,7 @@ raw_tools = [
     generate_images,
     query_news_table,
     generate_video,
+    generate_podcast_video,
 ]
 
 agent_config = AgentConfig()
