@@ -1,14 +1,24 @@
 from loguru import logger
 import time
+import os
+import shutil
+from moviepy import ImageClip
 from google import genai
 from google.genai import types
 from typing import Literal
-from .config import VideoGenToolConfig
-from .schemas import VideoGenRequest, VideoGenResponse
-from utils.gcp.gcs import upload_bytes
+from .config import VideoGenToolConfig, PodcastVideoConfig
+from .schemas import (
+    VideoGenRequest,
+    VideoGenResponse,
+    PodcastVideoRequest,
+    PodcastVideoResponse,
+)
+from utils.gcp.gcs import upload_bytes, get_file, upload_file
+from ..audio.audio_data import _get_audio
 
 
 video_config = VideoGenToolConfig()
+podcast_config = PodcastVideoConfig()
 
 genai_client = genai.Client(api_key=video_config.GEMINI_API_KEY.get_secret_value())
 
@@ -96,3 +106,71 @@ def generate_video(video_request: VideoGenRequest) -> VideoGenResponse:
     result = VideoGenResponse(video_url=video_url)
 
     return result
+
+
+def generate_podcast_video(video_request: PodcastVideoRequest) -> PodcastVideoResponse:
+    """
+    Orchestration function that adds a cover image to the podcast audio,
+    stores it into Google Cloud Storage
+
+    Args:
+        video_request: PodcastVideoRequest -> Pydantic model containing the parameters for the video generation
+
+    Returns:
+        PodcastVideoResponse -> Object containing metadata related to the video
+    """
+    logger.info("Generating podcast video...")
+
+    gcs_audio_path = video_request.gcs_audio_path
+    audio_extension = gcs_audio_path.split(".")[-1]
+
+    logger.debug(f"{gcs_audio_path = }")
+
+    logger.debug("Getting audio...")
+    audio = _get_audio(audio_path=gcs_audio_path)
+
+    logger.debug("Getting cover image...")
+    image_bytes = get_file(
+        gcs_file_path=podcast_config.COVER_IMAGE,
+        bucket_name=video_config._CLOUD_PROVIDER.BUCKET_NAME,
+    )
+
+    logger.debug("Creating podcast video...")
+    image = ImageClip(image_bytes).with_duration(audio.duration)
+
+    video = image.with_audio(audio)
+
+    logger.debug("Saving the podcast video...")
+
+    temp_local_storage = podcast_config.TEMP_LOCAL_STORAGE.strip("/")
+    podcast_name = gcs_audio_path.split("/")[-1].replace(audio_extension, "mp4")
+
+    if not os.path.isdir(temp_local_storage):
+        os.makedirs(temp_local_storage)
+
+    temp_file = f"{temp_local_storage}/{podcast_name}"
+    video.write_videofile(
+        temp_file,
+        fps=60,
+    )
+
+    gcs_video_path = podcast_config.GCS_PATH.strip("/")
+    blob_name = f"{gcs_video_path}/{podcast_name}"
+
+    public_url = upload_file(
+        origin_file_path=temp_file,
+        destination_file_path=blob_name,
+        bucket_name=video_config._CLOUD_PROVIDER.BUCKET_NAME,
+        make_public=podcast_config.IS_PUBLIC,
+    )
+
+    # os does not allow to remove a folder if its not empty, shutil does
+    shutil.rmtree(temp_local_storage)
+
+    output = PodcastVideoResponse(
+        gcs_audio_path=gcs_audio_path,
+        gcs_video_path=blob_name,
+        public_url=public_url,
+    )
+
+    return output

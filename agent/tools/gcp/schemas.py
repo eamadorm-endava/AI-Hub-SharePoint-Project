@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 from typing import Annotated, Literal, Optional
 from datetime import datetime
 
@@ -8,7 +8,7 @@ class Blob(BaseModel, validate_assignment=True):
         str,
         Field(
             description="Generic blob name with extension (e.g. folder/file.txt)",
-            pattern=r"^([\w-]+/)*[\w-]+\.[a-z]+$",
+            pattern=r"^([\w-]+/)*[\w-]+\.[A-Za-z0-9]+$",
         ),
     ]
     content_type: Annotated[
@@ -54,6 +54,8 @@ class Blob(BaseModel, validate_assignment=True):
 
 
 class TextBlob(Blob):
+    model_config = ConfigDict(validate_assignment=True)
+
     name: Annotated[
         str,
         Field(

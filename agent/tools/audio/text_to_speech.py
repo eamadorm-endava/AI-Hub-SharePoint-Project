@@ -3,12 +3,12 @@ import wave
 from io import BytesIO
 from google import genai
 from google.genai import types
-from .config import TTSToolConfig
+from .config import AudioConfig
 from .schemas import TTSRequest, TTSResponse
 from utils.gcp.gcs import upload_bytes
 
 
-tts_config = TTSToolConfig()
+tts_config = AudioConfig()
 
 genai_client = genai.Client(api_key=tts_config.GEMINI_API_KEY.get_secret_value())
 

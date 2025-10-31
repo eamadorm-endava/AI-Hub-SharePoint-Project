@@ -9,9 +9,11 @@ from agent.tools import (
     list_files_in_gcs_bucket,
     upload_text_to_gcs,
     text_to_speech,
+    get_audio_duration,
     generate_images,
     query_news_table,
     generate_video,
+    generate_podcast_video,
 )
 from agent.auxiliars import load_system_prompt
 
@@ -20,9 +22,11 @@ raw_tools = [
     list_files_in_gcs_bucket,
     upload_text_to_gcs,
     text_to_speech,
+    get_audio_duration,
     generate_images,
     query_news_table,
     generate_video,
+    generate_podcast_video,
 ]
 
 agent_config = AgentConfig()
